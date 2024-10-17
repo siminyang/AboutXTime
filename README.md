@@ -29,7 +29,7 @@ Whether for personal memories or shared experiences with friends, the Time Capsu
 * After opening a capsule, you can write a reply to your past self or friends, recording each step of growth. These replies along the timeline will become the most precious form of communication between you and your friends.
 
 ### Smart Search
-* The app comes with built-in object recognition and emotion analysis features, which automatically tag objects in photos and videos, and can detect emotional states within the content. Simply input keywords or emotion tags to quickly search for specific content and relive those memories.
+* The app comes with built-in object detection and sentiment analysis features, which automatically tag objects in photos, and can detect emotional states within the content. Simply input keywords or emotion tags to quickly search for specific content and relive those memories.
 
 ### Collection Feature
 * All opened capsules are saved in a collection, allowing you to revisit them at any time. Each moment of opening becomes a cherished memory.
