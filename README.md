@@ -19,20 +19,32 @@ Whether for personal memories or shared experiences with friends, the Time Capsu
 ### Create capsules
 * Supports recording text, photos, voice messages, videos, time, and location to capture every moment and memory. Whether it's a scenic view during a trip, a special occasion, or emotional ups and downs, everything can be preserved inside the capsule.
 
+![1](https://github.com/user-attachments/assets/edad646c-0bd9-4aa4-b0d2-4a212a110d04)      ![2](https://github.com/user-attachments/assets/0f5635d8-6835-42df-84ae-c895f13255db)
+
+
 ### Share and Co-create
 * You can create capsules for yourself, friends, or even invite friends to co-create, making the capsule's content richer and more engaging. When the set opening time arrives, you and your friends can open it together and enjoy the surprise.
 
 ### Surprise Unlock
 * You can set specific conditions for unlocking the capsule, such as a particular time and location. Whether it's tied to a specific place or a restricted area, it adds a sense of mystery and anticipation to the moment of opening.
+  
+![3](https://github.com/user-attachments/assets/75fd6660-6704-4dfb-9f28-8883efddf4a8)      ![4](https://github.com/user-attachments/assets/54c5bf25-b219-47ca-b06e-3230a4ef7d2a)
+
 
 ### Reply Feature
 * After opening a capsule, you can write a reply to your past self or friends, recording each step of growth. These replies along the timeline will become the most precious form of communication between you and your friends.
+  
+![5](https://github.com/user-attachments/assets/5600c869-bd10-4515-9588-17f52d18101e)      ![6](https://github.com/user-attachments/assets/30846921-bdfa-451e-927d-99f4fc934f09)
+
 
 ### Smart Search
 * The app comes with built-in object detection and sentiment analysis features, which automatically tag objects in photos, and can detect emotional states within the content. Simply input keywords or emotion tags to quickly search for specific content and relive those memories.
 
 ### Collection Feature
 * All opened capsules are saved in a collection, allowing you to revisit them at any time. Each moment of opening becomes a cherished memory.
+
+![7](https://github.com/user-attachments/assets/3ae4481d-8ef5-4c8a-9510-69495bb12e07)      ![8](https://github.com/user-attachments/assets/7ec0c925-0e7e-4746-a4e6-6035c857af48)
+
 
 ## Libraries
 - [NVActivityIndicatorView](https://github.com/ninjaprox/NVActivityIndicatorView)
