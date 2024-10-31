@@ -26,7 +26,6 @@ class CardViewModel: ObservableObject {
     @Published var localVideoUrl: URL?
     @Published var videoUrl: String?
 
-//    @Published var settings = CardModel()
     @Published var userId: String
     @Published var isAnonymous = false
     @Published var isLocationLocked = false
@@ -88,72 +87,6 @@ class CardViewModel: ObservableObject {
         if currentIndex > 0 { currentIndex -= 1 }
     }
 
-    func handleSelectedImage(_ image: UIImage) {
-        self.image = image
-        print("開始執行圖像分類")
-        classifier?.performInference(on: image) { [weak self] labelIndices in
-            DispatchQueue.main.async {
-                self?.imageTagLabels = labelIndices
-                print("圖像分類完成，標籤索引：\(labelIndices)")
-            }
-        }
-    }
-
-    func fetchContent() async {
-        let prompt = """
-        以下會給你一段文字，和一段情緒感受的分類標籤，閱讀後請挑選出「三個」最適合的心情類別標籤，直接給我三個標籤文字就好，回傳的標籤格式前面要分別加上hashtag"#"，並且三個標籤用頓號分隔，例如：#開心、#有自信、#興奮。如果無法從這段文字中辨別出任何情緒感受，或是這段文字為空值，請回傳：#平靜。
-                        let emotions = [
-                        "快樂": ["開心", "有自信", "興奮", "痛快", "舒適"],
-                        "得意": ["高興", "歡喜", "狂喜", "寧靜"],
-                        "幸福": ["愉快", "滿足", "沾沾自喜"],
-                        "雀躍": ["喜樂", "有希望", "有信心"],
-                        "輕鬆": ["平靜", "安心", "釋懷", "寬恕"],
-                        "憤怒": ["憤怒", "煩躁", "妒忌", "生氣", "不平", "憤恨", "不滿"],
-                        "暴躁": ["不耐煩", "焦躁"],
-                        "悲傷": ["孤單", "憂傷", "無助", "失望", "哀傷", "抑鬱", "悶悶不樂", "哀慟", "憂鬱", "空虛"],
-                        "委屈": ["沮喪", "絕望", "無奈", "難過"],
-                        "失落": ["氣餒", "心痛", "挫敗", "委屈"],
-                        "哀痛": ["傷心", "不開心", "遺憾", "無望"],
-                        "無力": ["徬徨", "孤立無援", "麻木", "苦惱"],
-                        "煩惱": ["心淡", "心力交瘁", "心煩意亂"],
-                        "恐懼": ["害怕", "緊張", "擔心", "不安", "焦急", "慌張", "恐懼", "憂心", "疑慮", "憂慮"],
-                        "迷惘": ["迷失", "戰戰兢兢", "畏懼", "焦慮"],
-                        "惶恐": ["擔憂", "忐忑", "心慌意亂"],
-                        "驚訝": ["震驚", "訝異", "驚喜", "嘆為觀止"],
-                        "厭惡": ["輕視", "輕蔑", "譏諷", "討厭", "憎惡", "厭倦"],
-                        "羞恥": ["內疚", "愧疚", "尷尬", "懊悔", "恥辱"],
-                        "自責": ["慚愧", "悔恨", "遺憾", "自卑", "難堪"],
-                        "愛": ["友善", "和善", "親密", "信賴", "寵愛", "被接納", "被信任", "感動", "被愛"]
-                        ]
-        待辨識的文字內容：
-        \(text)
-        """
-
-        do {
-            let response = try await model.generateContent(prompt)
-            DispatchQueue.main.async {
-                self.response = response.text ?? "No response"
-                print(">>>> Response: \(self.response)")
-            }
-        } catch {
-            DispatchQueue.main.async {
-                self.response = "Error: \(error.localizedDescription)"
-                print("Error: \(error.localizedDescription)")
-            }
-        }
-    }
-
-    func getAPIKey() -> String? {
-        if let path = Bundle.main.path(forResource: "APIKey", ofType: "plist"),
-           let xml = FileManager.default.contents(atPath: path),
-           let keyDict = try? PropertyListSerialization.propertyList(from: xml,
-                                                                     options: .mutableContainersAndLeaves,
-                                                                     format: nil) as? [String: String] {
-            return keyDict["apiKey"]
-        }
-        return nil
-    }
-
     private func resetToInitialCreationPageAndNavigateToPending() {
         NotificationCenter.default.post(name: .resetCreationPageAndNavigateToPending, object: nil)
     }
@@ -161,13 +94,37 @@ class CardViewModel: ObservableObject {
     func submitCapsule(completion: @escaping (Bool) -> Void) {
         print(">>>> 上傳確認 capsuleId: \(capsuleId ?? "nil")")
 
+        let errorMessages = validateInputs()
+        if !errorMessages.isEmpty {
+            handleValidationErrors(errorMessages, completion: completion)
+            return
+        }
+
+        // 驗證收件者 ID 是否存在於 Firestore 中
+        validateRecipientId { [weak self] isValid in
+            guard let self = self else { return }
+
+            if !isValid {
+                self.handleError("收件者 ID 不存在。請確認後再試一次。", completion: completion)
+                return
+            }
+
+            if self.capsuleId == nil {
+                self.createCapsule(completion: completion)
+            } else {
+                self.performCapsuleUpdate(completion: completion)
+            }
+        }
+    }
+
+    private func validateInputs() -> [String] {
         var errorMessages: [String] = []
 
         if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || text == "今天天氣很好，覺得充滿動力！ (必填)" {
             errorMessages.append("膠囊文字訊息不能為空👀")
         }
 
-        if isAnonymous == false && fromWhom.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if !isAnonymous && fromWhom.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             errorMessages.append("請填寫 Card 2 寄件人欄位名稱")
         }
 
@@ -184,39 +141,30 @@ class CardViewModel: ObservableObject {
             errorMessages.append("開啟時間必須至少為十分鐘後🧐")
         }
 
-        if !errorMessages.isEmpty {
-            errorMessage = errorMessages.joined(separator: "\n")
-            showAlert()
-            completion(false)
-            return
-        }
+        return errorMessages
+    }
 
-        // 驗證收件者 ID 是否存在於 Firestore 中
-        validateRecipientId { [weak self] isValid in
-            guard let self = self else { return }
+    private func handleValidationErrors(_ errorMessages: [String], completion: @escaping (Bool) -> Void) {
+        errorMessage = errorMessages.joined(separator: "\n")
+        showAlert()
+        completion(false)
+    }
 
-            if !isValid {
-                self.errorMessage = "收件者 ID 不存在。請確認後再試一次。"
-                self.showAlert()
-                completion(false)
-                return
-            }
+    private func handleError(_ message: String, completion: @escaping (Bool) -> Void) {
+        errorMessage = message
+        showAlert()
+        completion(false)
+    }
 
-            if self.capsuleId == nil {
-                FirebaseManager.shared.createCapsule { [weak self] result in
-                    switch result {
-                    case .success(let newCapsuleId):
-                        self?.capsuleId = newCapsuleId
-                        self?.performCapsuleUpdate(completion: completion)
-                        print(">>>> 新創建的 capsuleId: \(newCapsuleId)")
-                    case .failure(let error):
-                        self?.errorMessage = "創建膠囊失敗: \(error.localizedDescription)"
-                        self?.showAlert()
-                        completion(false)
-                    }
-                }
-            } else {
-                self.performCapsuleUpdate(completion: completion)
+    private func createCapsule(completion: @escaping (Bool) -> Void) {
+        FirebaseManager.shared.createCapsule { [weak self] result in
+            switch result {
+            case .success(let newCapsuleId):
+                self?.capsuleId = newCapsuleId
+                self?.performCapsuleUpdate(completion: completion)
+                print(">>>> 新創建的 capsuleId: \(newCapsuleId)")
+            case .failure(let error):
+                self?.handleError("創建膠囊失敗: \(error.localizedDescription)", completion: completion)
             }
         }
     }
@@ -320,6 +268,7 @@ class CardViewModel: ObservableObject {
     }
 }
 
+// MARK: - upload media methods
 extension CardViewModel {
     private func uploadImageIfNeeded(capsuleId: String, completion: @escaping (String?, String?) -> Void) {
         guard let image = image else {
@@ -384,13 +333,13 @@ extension CardViewModel {
         }
 
         let from = fromWhom.isEmpty ? "Unknown" : fromWhom
-        let to = toWhom.isEmpty ? "You" : toWhom
+        let toName = toWhom.isEmpty ? "You" : toWhom
 
         let content = Content(
             imgUrl: imageUrl, text: text,
             audioUrl: audioUrl, videoUrl: videoUrl,
             userId: userId,
-            fromWhom: from, toWhom: to
+            fromWhom: from, toWhom: toName
         )
 
         let location = Location(
@@ -454,5 +403,72 @@ extension CardViewModel {
         } catch {
             print("删除本地文件失败: \(error.localizedDescription)")
         }
+    }
+}
+
+// MARK: - Models
+extension CardViewModel {
+    func handleSelectedImage(_ image: UIImage) {
+        self.image = image
+        print("開始執行圖像分類")
+        classifier?.performInference(on: image) { [weak self] labelIndices in
+            DispatchQueue.main.async {
+                self?.imageTagLabels = labelIndices
+                print("圖像分類完成，標籤索引：\(labelIndices)")
+            }
+        }
+    }
+
+    @MainActor
+    func fetchContent() async {
+        let prompt = """
+        以下會給你一段文字，和一段情緒感受的分類標籤，閱讀後請挑選出「三個」最適合的心情類別標籤，直接給我三個標籤文字就好，回傳的標籤格式前面要分別加上hashtag"#"，並且三個標籤用頓號分隔，例如：#開心、#有自信、#興奮。
+        如果無法從這段文字中辨別出任何情緒感受，或是這段文字為空值，請回傳：#平靜。
+                        let emotions = [
+                        "快樂": ["開心", "有自信", "興奮", "痛快", "舒適"],
+                        "得意": ["高興", "歡喜", "狂喜", "寧靜"],
+                        "幸福": ["愉快", "滿足", "沾沾自喜"],
+                        "雀躍": ["喜樂", "有希望", "有信心"],
+                        "輕鬆": ["平靜", "安心", "釋懷", "寬恕"],
+                        "憤怒": ["憤怒", "煩躁", "妒忌", "生氣", "不平", "憤恨", "不滿"],
+                        "暴躁": ["不耐煩", "焦躁"],
+                        "悲傷": ["孤單", "憂傷", "無助", "失望", "哀傷", "抑鬱", "悶悶不樂", "哀慟", "憂鬱", "空虛"],
+                        "委屈": ["沮喪", "絕望", "無奈", "難過"],
+                        "失落": ["氣餒", "心痛", "挫敗", "委屈"],
+                        "哀痛": ["傷心", "不開心", "遺憾", "無望"],
+                        "無力": ["徬徨", "孤立無援", "麻木", "苦惱"],
+                        "煩惱": ["心淡", "心力交瘁", "心煩意亂"],
+                        "恐懼": ["害怕", "緊張", "擔心", "不安", "焦急", "慌張", "恐懼", "憂心", "疑慮", "憂慮"],
+                        "迷惘": ["迷失", "戰戰兢兢", "畏懼", "焦慮"],
+                        "惶恐": ["擔憂", "忐忑", "心慌意亂"],
+                        "驚訝": ["震驚", "訝異", "驚喜", "嘆為觀止"],
+                        "厭惡": ["輕視", "輕蔑", "譏諷", "討厭", "憎惡", "厭倦"],
+                        "羞恥": ["內疚", "愧疚", "尷尬", "懊悔", "恥辱"],
+                        "自責": ["慚愧", "悔恨", "遺憾", "自卑", "難堪"],
+                        "愛": ["友善", "和善", "親密", "信賴", "寵愛", "被接納", "被信任", "感動", "被愛"]
+                        ]
+        待辨識的文字內容：
+        \(text)
+        """
+
+        do {
+            let response = try await model.generateContent(prompt)
+            self.response = response.text ?? "No response"
+            print(">>>> Response: \(self.response)")
+        } catch {
+            self.response = "Error: \(error.localizedDescription)"
+            print("Error: \(error.localizedDescription)")
+        }
+    }
+
+    func getAPIKey() -> String? {
+        if let path = Bundle.main.path(forResource: "APIKey", ofType: "plist"),
+           let xml = FileManager.default.contents(atPath: path),
+           let keyDict = try? PropertyListSerialization.propertyList(from: xml,
+                                                                     options: .mutableContainersAndLeaves,
+                                                                     format: nil) as? [String: String] {
+            return keyDict["apiKey"]
+        }
+        return nil
     }
 }

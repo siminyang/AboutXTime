@@ -1,0 +1,11 @@
+excluded:
+  - Pods
+  - AboutXTime/AppDelegate.swift
+  - AboutXTime/SceneDelegate.swift
+line_length:
+  ignores_comments: true
+  ignores_urls: true
+
+disabled_rules:
+  - trailing_whitespace
+

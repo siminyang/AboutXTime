@@ -24,7 +24,7 @@ struct ImagePickerCardView: View {
 
                 Button(action: {
                     clearImageData()
-                }) {
+                }, label: {
                     HStack {
                         Image(systemName: "trash")
                         Text("刪除圖片")
@@ -32,7 +32,7 @@ struct ImagePickerCardView: View {
                     .padding()
                     .foregroundColor(.red)
                     .font(.headline)
-                }
+                })
                 .padding(.bottom)
 
             } else {
@@ -86,8 +86,7 @@ struct ImagePickerCardView: View {
                 }
             ), imageUrl: $viewModel.localImageUrl, sourceType: sourceType)
         }
-        .onChange(of: showImagePicker) { _ in
-        }
+        .onChange(of: showImagePicker) {}
     }
 
     private func clearImageData() {

@@ -31,38 +31,17 @@ class CapsuleViewModel: ObservableObject {
         stopListening()
     }
 
-//    func startListening() {
-//        listener = FirebaseManager.shared.addCapsuleListener(capsuleId: capsule.capsuleId) { [weak self] result in
-//            switch result {
-//            case .success(let updatedCapsule):
-//                DispatchQueue.main.async {
-//                    self?.capsule = updatedCapsule
-//                    self?.replyMessages = updatedCapsule.replyMessages ?? []
-//
-//                    // 更新快取中的好友資料
-//                    for reply in self?.replyMessages ?? [] {
-//                        if let cachedFriend = FriendsCacheManager.shared.getFriendFromCache(friendId: reply.userId) {
-//                            print(">>>> Friend found in cache: \(cachedFriend.fullName)")
-//                        } else {
-//                            print("Friend not found in cache, fetching from server...")
-//                            FirebaseManager.shared.fetchFriendData(currentUserId: self?.userId ?? "" ,
-// friendId: reply.userId) { result in
-//                                switch result {
-//                                case .success(let friend):
-//                                    print("Fetched friend data: \(friend.id)")
-//
-//                                case .failure(let error):
-//                                    print("Failed to fetch friend data: \(error.localizedDescription)")
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            case .failure(let error):
-//                print("Failed to listen for capsule updates: \(error.localizedDescription)")
-//            }
-//        }
-//    }
+    func updateCapsuleStatus() {
+        FirebaseManager.shared.updateCapsuleStatus(capsuleId: capsule.capsuleId, status: 1) { result in
+            switch result {
+            case .success:
+                print("膠囊狀態更新成功")
+            case .failure(let error):
+                print("膠囊狀態更新失敗: \(error.localizedDescription)")
+            }
+        }
+    }
+
     func startListening() {
         listener = FirebaseManager.shared.addCapsuleListener(capsuleId: capsule.capsuleId) { [weak self] result in
             DispatchQueue.main.async {

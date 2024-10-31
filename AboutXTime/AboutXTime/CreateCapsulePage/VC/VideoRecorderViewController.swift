@@ -28,7 +28,7 @@ class VideoRecorderViewController: UIViewController, AVCaptureFileOutputRecordin
         captureSession.addInput(videoInput)
 
         videoOutput = AVCaptureMovieFileOutput()
-        if let videoOutput = videoOutput {
+        if let videoOutput = videoOutput { 
             captureSession.addOutput(videoOutput)
         }
 

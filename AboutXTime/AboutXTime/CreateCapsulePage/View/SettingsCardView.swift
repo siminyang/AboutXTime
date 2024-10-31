@@ -85,7 +85,7 @@ struct SettingsCardView: View {
             .font(.subheadline)
             .foregroundColor(.white)
             .frame(height: 50)
-            .tint(STColor.C1.color)
+            .tint(STColor.CC1.color)
 
             HStack {
                 Image(systemName: "person.fill.questionmark")
@@ -103,8 +103,8 @@ struct SettingsCardView: View {
                     .padding(.vertical, 5)
                     .tint(STColor.CC2.color)
                     .font(.subheadline)
-                    .onChange(of: isLocationLocked) { value in
-                        if value {
+                    .onChange(of: isLocationLocked) {
+                        if isLocationLocked {
                             getCurrentLocation()
                         }
                     }

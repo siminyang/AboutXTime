@@ -23,7 +23,7 @@ struct CardView<Content: View>: View {
                 .shadow(radius: 50)
         }
         .background(
-            STColor.C1.color.opacity(0.2)
+            STColor.CC1.color.opacity(0.2)
                 .cornerRadius(20)
         )
         .overlay(

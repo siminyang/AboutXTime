@@ -65,12 +65,12 @@ struct ShowCapsuleReplySectionView: View {
                                         scrollViewProxy.scrollTo("bottomAnchor", anchor: .bottom)
                                     }
                                 }
-                            }) {
+                            }, label: {
                                 Image(systemName: "paperplane.fill")
                                     .padding()
                                     .foregroundColor(.gray)
                                     .cornerRadius(8)
-                            }
+                            })
                         }
 
                         .padding(.top, 20)
@@ -78,7 +78,7 @@ struct ShowCapsuleReplySectionView: View {
                     .padding(.horizontal)
                     .id("bottomAnchor")
                 }
-                .onChange(of: viewModel.replyMessages) { _ in
+                .onChange(of: viewModel.replyMessages) {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         withAnimation {
                             scrollViewProxy.scrollTo("bottomAnchor", anchor: .bottom)

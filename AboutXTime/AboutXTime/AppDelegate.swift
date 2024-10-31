@@ -25,16 +25,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         _ = CardViewModel.shared
 
-//        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
-//            if granted {
-//                DispatchQueue.main.async {
-//                    UIApplication.shared.registerForRemoteNotifications()
-//                }
-//            }
-//        }
-//
-//        UNUserNotificationCenter.current().delegate = self
-
         return true
     }
 
@@ -53,33 +43,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
-
-//    // 获取 APNs 设备令牌
-//    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-//        let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-//        print("APNs Device Token: \(tokenString)")
-//        // 发送此 token 到你的服务器
-//    }
-//
-//    // 处理收到的推送通知
-//    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-//        let userInfo = response.notification.request.content.userInfo
-//        print("Received notification with info: \(userInfo)")
-//
-//        // 在这里处理新胶囊通知
-//        completionHandler()
-//    }
-//
-//    func triggerLocalNotification(capsule: Capsule) {
-//        let content = UNMutableNotificationContent()
-//        content.title = "新的膠囊可以開啟!"
-//        content.body = "膠囊可以開啟，點擊查看。"
-//        content.sound = UNNotificationSound.default
-//
-//        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-//
-//        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-//
-//        UNUserNotificationCenter.current().add(request)
-//    }
 }

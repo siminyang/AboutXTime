@@ -16,7 +16,7 @@ extension UINavigationBar {
         backButtonAppearance.setTitleTextAttributes([.foregroundColor: UIColor.clear], for: .normal)
 
         let navigationBarAppearance = UINavigationBar.appearance()
-        navigationBarAppearance.tintColor = STColor.C1.uiColor.withAlphaComponent(0.5)
+        navigationBarAppearance.tintColor = STColor.CC1.uiColor.withAlphaComponent(0.5)
         navigationBarAppearance.isTranslucent = true
         navigationBarAppearance.setBackgroundImage(UIImage(), for: .default)
         navigationBarAppearance.shadowImage = UIImage()

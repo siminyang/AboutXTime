@@ -23,7 +23,7 @@ struct SearchPageView: View {
             HStack {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(STColor.C1.color.opacity(1),
+                        .stroke(STColor.CC1.color.opacity(1),
                                 lineWidth: 1)
 
                     HStack {
@@ -39,10 +39,10 @@ struct SearchPageView: View {
                         Button(action: {
                             viewModel.searchText = ""
                             viewModel.searchCapsules()
-                        }) {
+                        }, label: {
                             Image(systemName: "xmark.circle.fill")
                                 .foregroundColor(.white.opacity(0.5))
-                        }
+                        })
 
                         Spacer()
                     }
@@ -54,11 +54,11 @@ struct SearchPageView: View {
                 Button(action: {
                     viewModel.searchCapsules()
                     hideKeyboard()
-                }) {
+                }, label: {
                     Image(systemName: "magnifyingglass")
                         .background(.black)
                         .foregroundColor(.white.opacity(0.5))
-                }
+                })
                 .padding()
             }
 
@@ -78,7 +78,6 @@ struct SearchPageView: View {
                     Color.clear.frame(height: 200)
                 }
             } else {
-                //                Spacer()
                 Text("""
 
                 .     .       .
@@ -174,7 +173,7 @@ struct SearchPageView: View {
     // 刪除膠囊
     private func deleteCapsule(at indexSet: IndexSet, for age: Int, in capsules: [Capsule]) {
         guard let index = indexSet.first,
-              let _ = viewModel.filteredCapsules[age] else { return }
+             viewModel.filteredCapsules[age] != nil else { return }
 
         let capsuleToDelete = capsules[index]
 

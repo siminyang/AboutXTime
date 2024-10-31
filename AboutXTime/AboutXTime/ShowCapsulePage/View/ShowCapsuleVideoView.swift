@@ -22,12 +22,12 @@ struct ShowCapsuleVideoView: View {
                 Button(action: {
                     setupPlayer(url: url)
                     showFullScreenPlayer = true
-                }) {
+                }, label: {
                     Image(systemName: "video.fill")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 35, height: 30)
-                }
+                })
                 .padding()
                 .background(Color.white.opacity(0.1))
                 .foregroundColor(.white)
@@ -55,12 +55,12 @@ struct ShowCapsuleVideoView: View {
                                 Spacer()
                                 Button(action: {
                                     showFullScreenPlayer = false
-                                }) {
+                                }, label: {
                                     Image(systemName: "xmark.circle.fill")
                                         .font(.largeTitle)
                                         .foregroundColor(.white)
                                         .padding()
-                                }
+                                })
                             }
                             Spacer()
                         }

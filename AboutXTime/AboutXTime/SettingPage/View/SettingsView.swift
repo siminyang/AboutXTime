@@ -16,11 +16,11 @@ struct SettingsView: View {
             List {
                 Button(action: {
                     viewModel.showLogoutAlert = true
-                }) {
+                }, label: {
                     Text("登出")
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, alignment: .center)
-                }
+                })
                 .buttonStyle(.plain)
                 .listRowBackground(Color.black)
                 .alert(isPresented: $viewModel.showLogoutAlert) {
@@ -36,10 +36,10 @@ struct SettingsView: View {
 
                 Button(action: {
                     viewModel.showDeleteAlert = true
-                }) {
+                }, label: {
                     Text("刪除帳戶")
                         .frame(maxWidth: .infinity, alignment: .center)
-                }
+                })
                 .listRowBackground(Color.black)
                 .foregroundColor(.red)
                 .alert(isPresented: $viewModel.showDeleteAlert) {

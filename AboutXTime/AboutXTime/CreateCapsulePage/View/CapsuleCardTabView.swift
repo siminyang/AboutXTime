@@ -9,7 +9,7 @@ import SwiftUI
 import NVActivityIndicatorView
 
 struct CapsuleCardTabView: View {
-    @ObservedObject var viewModel = CardViewModel()
+    @ObservedObject var viewModel: CardViewModel
     @State private var showAlert = false
     @State private var isUploading = false
 
@@ -70,7 +70,7 @@ struct CapsuleCardTabView: View {
                             showAlert = true
                         }
                     }
-                }) {
+                }, label: {
                     Text("寄往未來")
                         .padding()
                         .background(Color.white.opacity(0.1))
@@ -78,9 +78,9 @@ struct CapsuleCardTabView: View {
                         .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
-                                .stroke(STColor.C1.color.opacity(0.5), lineWidth: 2)
+                                .stroke(STColor.CC1.color.opacity(0.5), lineWidth: 2)
                         )
-                }
+                })
                 .opacity(viewModel.currentIndex == 4 && !isUploading ? 1 : 0)
                 .disabled(viewModel.currentIndex != 4 || isUploading)
                 .animation(.easeInOut, value: viewModel.currentIndex)
@@ -114,7 +114,9 @@ struct CapsuleCardTabView: View {
     }
 
     private func navigateToTab(index: Int) {
-        guard let window = UIApplication.shared.windows.first,
+        guard let windowScene = UIApplication.shared.connectedScenes
+                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+              let window = windowScene.windows.first,
               let tabBarController = window.rootViewController as? UITabBarController else {
             return
         }

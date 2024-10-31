@@ -36,29 +36,33 @@ class ProfileViewModel: ObservableObject {
     }
 
     private func setupUserAvatar() {
-        let userRef = database.collection("users").document(userIDFromFirestore)
-        userRef.getDocument { [weak self] document, error in
+        FirebaseManager.shared.fetchDocument(collection: Constant.users,
+                                             documentID: userIDFromFirestore) { [weak self] result in
             guard let self = self else { return }
-
-            if let error = error {
+            switch result {
+            case .success(let document):
+                if let avatarUrl = document.data()?["avatarUrl"] as? String, !avatarUrl.isEmpty {
+                    self.userAvatar = avatarUrl
+                    UserDefaults.standard.set(avatarUrl, forKey: self.avatarKey)
+                } else {
+                    self.setRandomAvatar()
+                }
+            case .failure(let error):
                 print("Error fetching avatarUrl: \(error.localizedDescription)")
-                return
-            }
-
-            if let avatarUrl = document?.data()?["avatarUrl"] as? String, !avatarUrl.isEmpty {
-                self.userAvatar = avatarUrl
-                UserDefaults.standard.set(avatarUrl, forKey: self.avatarKey)
-            } else {
-                let randomAvatar = "planet\(Int.random(in: 1...18))"
-                self.userAvatar = randomAvatar
-                UserDefaults.standard.set(randomAvatar, forKey: self.avatarKey)
-                self.updateUserAvatarInFirestore(avatar: randomAvatar)
+                self.setRandomAvatar()
             }
         }
     }
 
+    private func setRandomAvatar() {
+        let randomAvatar = "planet\(Int.random(in: 1...18))"
+        self.userAvatar = randomAvatar
+        UserDefaults.standard.set(randomAvatar, forKey: self.avatarKey)
+        updateUserAvatarInFirestore(avatar: randomAvatar)
+    }
+
     private func startListeningForUserChanges() {
-        let userRef = database.collection("users").document(userIDFromFirestore)
+        let userRef = database.collection(Constant.users).document(userIDFromFirestore)
         listener = userRef.addSnapshotListener { [weak self] snapshot, error in
             guard let self = self else { return }
 
@@ -73,117 +77,61 @@ class ProfileViewModel: ObservableObject {
             }
 
             DispatchQueue.main.async {
-                if let avatarUrl = data["avatarUrl"] as? String {
-                    self.userAvatar = avatarUrl
-                }
-
                 self.userFullName = data["name"] as? String ?? "User"
-                UserDefaults.standard.set(self.userFullName, forKey: "userFullName")
+                self.userAvatar = data["avatarUrl"] as? String ?? self.userAvatar
 
                 if let friendsArray = data["friends"] as? [[String: Any]] {
-                    self.friends = friendsArray.compactMap { friendData in
-                        let id = friendData["id"] as? String ?? ""
-                        let fullName = friendData["fullName"] as? String ?? ""
-                        let timestamp = (friendData["latestInteractionDate"] as? Timestamp)?.dateValue() ?? Date()
-                        let avatar = friendData["avatar"] as? String ?? "planet\(Int.random(in: 1...18))"
-
-                        let friend = Friend(id: id,
-                                            fullName: fullName,
-                                            avatar: avatar,
-                                            latestInteractionDate: timestamp)
-
-                        FriendsCacheManager.shared.cacheFriend(friend)
-
-                        return friend
-                    }
+                    self.friends = friendsArray.compactMap { Friend(dictionary: $0) }
                     self.fetchNamesForEmptyFriends()
                     self.friends.sort { $0.latestInteractionDate > $1.latestInteractionDate }
-
-                } else {
-                    print("No friends found for the user.")
                 }
             }
         }
     }
 
     func fetchUserData() {
-        print("Fetching data for userID: \(userIDFromFirestore)")
+        FirebaseManager.shared.fetchDocument(
+            collection: Constant.users,
+            documentID: userIDFromFirestore) { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success(let document):
+                    let data = document.data()
+                    self.userFullName = data?["name"] as? String ?? "User"
+                    self.userID = self.userIDFromFirestore
 
-        let userRef = database.collection("users").document(userIDFromFirestore)
-
-        userRef.getDocument { [weak self] document, error in
-            guard let self = self else { return }
-
-            if let error = error {
-                print("Error fetching user data: \(error.localizedDescription)")
-                return
-            }
-
-            guard let document = document, document.exists, let data = document.data() else {
-                print("User document does not exist or data is empty")
-                return
-            }
-
-            DispatchQueue.main.async {
-                self.userFullName = data["name"] as? String ?? "User"
-                UserDefaults.standard.set(self.userFullName, forKey: "userFullName")
-                self.userID = self.userIDFromFirestore
-
-                if let friendsArray = data["friends"] as? [[String: Any]] {
-                    self.friends = friendsArray.compactMap { friendData in
-                        let id = friendData["id"] as? String ?? ""
-                        let fullName = friendData["fullName"] as? String ?? ""
-                        let timestamp =
-                        (friendData["latestInteractionDate"] as? Timestamp)?.dateValue() ?? Date()
-                        let avatar = friendData["avatar"] as? String ?? "planet\(Int.random(in: 1...18))"
-
-                        let friend = Friend(id: id,
-                                            fullName: fullName,
-                                            avatar: avatar,
-                                            latestInteractionDate: timestamp)
-
-                        FriendsCacheManager.shared.cacheFriend(friend)
-
-                        return friend
+                    if let friendsArray = data?["friends"] as? [[String: Any]] {
+                        self.friends = friendsArray.compactMap { Friend(dictionary: $0) }
+                        self.fetchNamesForEmptyFriends()
+                        self.friends.sort { $0.latestInteractionDate > $1.latestInteractionDate }
                     }
-
-                    self.fetchNamesForEmptyFriends()
-
-                    self.friends.sort { $0.latestInteractionDate > $1.latestInteractionDate }
-                } else {
-                    print("No friends found for the user.")
+                case .failure(let error):
+                    print("Error fetching user data: \(error.localizedDescription)")
                 }
             }
-        }
     }
 
     // 查找朋友的名字
     private func fetchNamesForEmptyFriends() {
-        for (index, friend) in friends.enumerated() {
-            if friend.fullName.isEmpty {
-                fetchFriendName(friendID: friend.id) { [weak self] name in
-                    guard let self = self else { return }
-                    DispatchQueue.main.async {
-                        self.friends[index].fullName = name
-                        self.updateFriendsInFirestore()
-                    }
+        for (index, friend) in friends.enumerated()
+        where friend.fullName.isEmpty {
+            fetchFriendName(friendID: friend.id) { [weak self] name in
+                guard let self = self else { return }
+                DispatchQueue.main.async {
+                    self.friends[index].fullName = name
+                    self.updateFriendsInFirestore()
                 }
             }
         }
     }
 
     private func fetchFriendName(friendID: String, completion: @escaping (String) -> Void) {
-        let friendRef = database.collection("users").document(friendID)
-        friendRef.getDocument { document, error in
-            if let error = error {
-                print("Error fetching friend's name: \(error.localizedDescription)")
-                completion("Unknown")
-                return
-            }
-
-            if let name = document?.data()?["name"] as? String {
+        FirebaseManager.shared.fetchDocument(collection: Constant.users, documentID: friendID) { result in
+            switch result {
+            case .success(let document):
+                let name = document.data()?["name"] as? String ?? "Unknown"
                 completion(name)
-            } else {
+            case .failure:
                 completion("Unknown")
             }
         }
@@ -191,10 +139,22 @@ class ProfileViewModel: ObservableObject {
 
     // MARK: 更改頭像或名稱方法
     private func updateUserAvatarInFirestore(avatar: String) {
-        let userRef = database.collection("users").document(userIDFromFirestore)
-        userRef.updateData(["avatarUrl": avatar]) { error in
+        FirebaseManager.shared.saveData(collection: Constant.users,
+                                        documentID: userIDFromFirestore,
+                                        data: ["avatarUrl": avatar]) { error in
             if let error = error {
                 print("Error updating avatar in Firestore: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func updateFriendsInFirestore() {
+        let friendsData = friends.map { $0.toDictionary() }
+        FirebaseManager.shared.saveData(collection: Constant.users,
+                                        documentID: userIDFromFirestore,
+                                        data: ["friends": friendsData]) { error in
+            if let error = error {
+                print("Error updating friends in Firestore: \(error.localizedDescription)")
             }
         }
     }
@@ -219,19 +179,10 @@ class ProfileViewModel: ObservableObject {
         friends[index].fullName = newName
         updateFriendsInFirestore()
     }
+}
 
-    private func updateFriendsInFirestore() {
-        let userRef = database.collection("users").document(userIDFromFirestore)
-        userRef.updateData([
-            "friends": friends.map { $0.toDictionary() }
-        ]) { error in
-            if let error = error {
-                print("Error updating friends in Firestore: \(error.localizedDescription)")
-            }
-        }
-    }
-
-    // MARK: 舉報方法
+// MARK: - 舉報方法
+extension ProfileViewModel {
     func reportFriend(friendId: String) {
         print("Reporting friend with ID: \(friendId)")
 

@@ -95,7 +95,6 @@ struct CapsuleBubbleView: View {
             if canOpen {
                 let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
                 impactFeedback.impactOccurred()
-                //                AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
 
                 if capsule.isLocationLocked {
                     showMapPage = true
@@ -143,7 +142,7 @@ struct CapsuleBubbleView: View {
         } else {
             timeRemaining = "00:00:00"
             progress = 1.0
-            progressColor = STColor.C1.color.opacity(0.3)  // 時間到
+            progressColor = STColor.CC1.color.opacity(0.3)  // 時間到
             canOpen = true
         }
     }

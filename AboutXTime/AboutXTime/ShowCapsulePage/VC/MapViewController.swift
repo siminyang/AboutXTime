@@ -14,7 +14,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
     private let capsule: Capsule
     private var locationManager = CLLocationManager()
     private var mapView = MKMapView()
-    private var distanceLabel = UILabel()
+    var distanceLabel = UILabel()
     private var userLocationAnnotation: MKPointAnnotation?
 
     init(capsule: Capsule) {
@@ -76,26 +76,32 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         guard let location = capsule.location else { return }
         let targetCoordinate =
         CLLocationCoordinate2D(latitude: location.latitude ?? 0.0, longitude: location.longitude ?? 0.0)
+
+        // 膠囊準確位置的標記
         let region =
-        MKCoordinateRegion(center: targetCoordinate, latitudinalMeters: 10000, longitudinalMeters: 10000) // 使用公里範圍
+        MKCoordinateRegion(center: targetCoordinate,
+                           latitudinalMeters: 10000,
+                           longitudinalMeters: 10000) // 地圖上顯示的範圍大小（10000 公尺範圍）
         mapView.setRegion(region, animated: true)
 
-        // 添加範圍圓圈（需要將範圍轉換為米）
+        // 膠囊圓圈覆蓋範圍
         let circle = MKCircle(center: targetCoordinate,
                               radius: CLLocationDistance((location.radius ?? 0) * 1000))  // 將公里轉換為米
         mapView.addOverlay(circle)
 
+        // 膠囊位置的文字標記
         let annotation = MKPointAnnotation()
         annotation.coordinate = targetCoordinate
         annotation.title = "Your Capsule Location"
         mapView.addAnnotation(annotation)
     }
 
+    // 覆蓋範圍的圓圈樣式
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         if let circleOverlay = overlay as? MKCircle {
             let circleRenderer = MKCircleRenderer(overlay: circleOverlay)
             circleRenderer.strokeColor = STColor.CC2.uiColor
-            circleRenderer.fillColor = STColor.C1.uiColor.withAlphaComponent(0.3)
+            circleRenderer.fillColor = STColor.CC1.uiColor.withAlphaComponent(0.3)
             circleRenderer.lineWidth = 1
             return circleRenderer
         }
@@ -142,23 +148,44 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         let latDifference = targetLocation.latitude - userLocation.latitude
         let lonDifference = targetLocation.longitude - userLocation.longitude
 
-        if abs(latDifference) > abs(lonDifference) {
-            if latDifference > 0 {
-                return "北"
-            } else {
-                return "南"
-            }
-        } else {
-            if lonDifference > 0 {
-                return "東"
-            } else {
-                return "西"
-            }
+        if latDifference == 0 {
+            return lonDifference > 0 ? "東" : "西"
         }
+        if lonDifference == 0 {
+            return latDifference > 0 ? "北" : "南"
+        }
+
+        if latDifference > 0 && lonDifference > 0 {
+            return "東北"
+        }
+        if latDifference > 0 && lonDifference < 0 {
+            return "西北"
+        }
+        if latDifference < 0 && lonDifference > 0 {
+            return "東南"
+        }
+        if latDifference < 0 && lonDifference < 0 {
+            return "西南"
+        }
+
+        return ""
     }
 
     @objc private func mapTapped() {
         let showPageVC = ShowCapsulePageViewController(capsule: capsule)
         navigationController?.pushViewController(showPageVC, animated: true)
+    }
+}
+
+extension MapViewController {
+    func testupdateDistanceLabel(distance: CLLocationDistance,
+                                 userLocation: CLLocationCoordinate2D,
+                                 targetLocation: CLLocationCoordinate2D) {
+        updateDistanceLabel(distance: distance, userLocation: userLocation, targetLocation: targetLocation)
+    }
+
+    func testcalculateDirection(from userLocation: CLLocationCoordinate2D,
+                                to targetLocation: CLLocationCoordinate2D) -> String {
+        return calculateDirection(from: userLocation, to: targetLocation)
     }
 }

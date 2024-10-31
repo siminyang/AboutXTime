@@ -53,18 +53,8 @@ class LoginViewController: UIViewController {
 
         view.layer.insertSublayer(playerLayer, at: 0)
 
-        // Loop the video
-//        NotificationCenter.default.addObserver(self, selector: #selector(loopVideo), 
-//                                               name: .AVPlayerItemDidPlayToEndTime,
-//                                               object: player?.currentItem)
-
         player?.play()
     }
-
-//    @objc private func loopVideo() {
-//        player?.seek(to: .zero)
-//        player?.play()
-//    }
 
     // MARK: - 設置 Apple Sign-In 按鈕
     private func setupAppleSignInButton() {
@@ -77,7 +67,7 @@ class LoginViewController: UIViewController {
                                          width: buttonWidth,
                                          height: buttonHeight)
 
-        appleSignInButton.layer.borderColor = STColor.C1.uiColor.cgColor
+        appleSignInButton.layer.borderColor = STColor.CC1.uiColor.cgColor
         appleSignInButton.layer.borderWidth = 0.5
         appleSignInButton.layer.cornerRadius = 20
 
@@ -138,23 +128,17 @@ class LoginViewController: UIViewController {
                                  didCompleteWithAuthorization authorization: ASAuthorization) {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
             let userIdentifier = appleIDCredential.user
-
-            if let userData = userIdentifier.data(using: .utf8) {
-                let success = KeychainManager.standard.save(
-                    userData, service: "com.aboutXTime.service",
-                    account: "appleUserIdentifier")
-
-                print(success ? "Successfully saved userIdentifier to Keychain." :
-                        "Failed to save userIdentifier to Keychain.")
-            }
+            saveUserIdentifierToKeychain(userIdentifier)
 
             guard let nonce = currentNonce else {
                 fatalError("Invalid state: A login callback was received, but no login request was sent.")
             }
+
             guard let appleIDToken = appleIDCredential.identityToken else {
                 print("Unable to fetch identity token")
                 return
             }
+
             guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
                 print("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
                 return
@@ -166,81 +150,109 @@ class LoginViewController: UIViewController {
                 fullName: appleIDCredential.fullName
             )
 
-            let defaultName = "User"
-            let fullName = appleIDCredential.fullName != nil
-                ? "\(appleIDCredential.fullName?.givenName ?? "") \(appleIDCredential.fullName?.familyName ?? "")".trimmingCharacters(in: .whitespacesAndNewlines)
-                : defaultName
-            UserDefaults.standard.set(fullName.isEmpty ? defaultName : fullName, forKey: "userFullName")
+            let fullName = getFullName(from: appleIDCredential)
+            UserDefaults.standard.set(fullName, forKey: "userFullName")
 
-            Auth.auth().signIn(with: credential) { (authResult, error) in
-                if let error = error {
-                    print("Firebase Sign In with Apple failed: \(error)")
-                    return
-                }
-
-                guard let uid = authResult?.user.uid else { return }
-                UserDefaults.standard.set(uid, forKey: "userUID")
-                print("UID has been saved to UserDefaults: \(uid)")
-
-                let email = appleIDCredential.email ?? authResult?.user.email ?? "No Email"
-                let name = fullName.isEmpty ? authResult?.user.displayName ?? defaultName : fullName
-
-                let userRef = FirebaseManager.shared.firestore.collection(Constant.users).document(uid)
-
-                // 檢查 Firestore 中是否已有此使用者資料
-                userRef.getDocument { (document, error) in
-                    if let error = error {
-                        print("Error fetching user data: \(error)")
-                        return
-                    }
-
-                    if let document = document, document.exists, let data = document.data() {
-                        let existingName = data["name"] as? String ?? "User"
-                        let existingEmail = data["email"] as? String ?? "Non"
-                        let existingAvatarUrl = data["avatarUrl"] as? String ?? ""
-                        let existingCreatedCapsulesIds = data["createdCapsulesIds"] as? [String] ?? []
-                        let existingReceivedCapsulesIds = data["receivedCapsulesIds"] as? [String] ?? []
-                        let existingSharedCapsulesIds = data["sharedCapsulesIds"] as? [String] ?? []
-                        let existingFriends = data["friends"] as? [Friend] ?? []
-
-                        UserDefaults.standard.set(existingName, forKey: "userFullName")
-
-                        // 不做任何覆蓋，只是從伺服器獲取資料來使用
-                        let user = User(
-                            id: uid,
-                            email: existingEmail,
-                            name: existingName,
-                            avatarUrl: existingAvatarUrl,
-                            createdCapsulesIds: existingCreatedCapsulesIds,
-                            receivedCapsulesIds: existingReceivedCapsulesIds,
-                            sharedCapsulesIds: existingSharedCapsulesIds,
-                            friends: existingFriends,
-                            userIdentifier: userIdentifier
-                        )
-
-                        print("Loaded existing user data from Firestore: \(user)")
-                    } else {
-                        // 如果文檔不存在，創建新的使用者資料
-                        let user = User(
-                            id: uid,
-                            email: email,
-                            name: name,
-                            avatarUrl: "",
-                            createdCapsulesIds: [],
-                            receivedCapsulesIds: [],
-                            sharedCapsulesIds: [],
-                            friends: [],
-                            userIdentifier: userIdentifier
-                        )
-
-                        self.saveUserToFirestore(user: user)
-                    }
-
-                    self.onLoginSuccess?()
-                    self.dismiss(animated: true, completion: nil)
-                }
-            }
+            signInWithApple(credential: credential, fullName: fullName, userIdentifier: userIdentifier)
         }
+    }
+
+    private func saveUserIdentifierToKeychain(_ userIdentifier: String) {
+        if let userData = userIdentifier.data(using: .utf8) {
+            let success =
+            KeychainManager.standard.save(userData, service: "com.aboutXTime.service",
+                                          account: "appleUserIdentifier")
+            print(success ? 
+                  "Successfully saved userIdentifier to Keychain." : "Failed to save userIdentifier to Keychain.")
+        }
+    }
+
+    private func getFullName(from credential: ASAuthorizationAppleIDCredential) -> String {
+        let defaultName = "User"
+        if let givenName = credential.fullName?.givenName, let familyName = credential.fullName?.familyName {
+            return "\(givenName) \(familyName)".trimmingCharacters(in: .whitespacesAndNewlines)
+        } else {
+            return defaultName
+        }
+    }
+
+    private func signInWithApple(credential: OAuthCredential, fullName: String, userIdentifier: String) {
+        Auth.auth().signIn(with: credential) { (authResult, error) in
+            if let error = error {
+                print("Firebase Sign In with Apple failed: \(error)")
+                return
+            }
+
+            guard let uid = authResult?.user.uid else { return }
+            UserDefaults.standard.set(uid, forKey: "userUID")
+            print("UID has been saved to UserDefaults: \(uid)")
+
+            let email = authResult?.user.email ?? "No Email"
+            let name = fullName.isEmpty ? (authResult?.user.displayName ?? "User") : fullName
+
+            self.checkIfUserExistsInFirestore(uid: uid, email: email, name: name, userIdentifier: userIdentifier)
+        }
+    }
+
+    private func checkIfUserExistsInFirestore(uid: String, email: String, name: String, userIdentifier: String) {
+        let userRef = FirebaseManager.shared.firestore.collection(Constant.users).document(uid)
+        userRef.getDocument { (document, error) in
+            if let error = error {
+                print("Error fetching user data: \(error)")
+                return
+            }
+
+            if let document = document, document.exists, let data = document.data() {
+                self.loadExistingUserData(document: data, uid: uid, userIdentifier: userIdentifier)
+            } else {
+                self.createNewUser(uid: uid, email: email, name: name, userIdentifier: userIdentifier)
+            }
+
+            self.onLoginSuccess?()
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+
+    private func loadExistingUserData(document: [String: Any], uid: String, userIdentifier: String) {
+        let existingName = document["name"] as? String ?? "User"
+        let existingEmail = document["email"] as? String ?? "No Email"
+        let existingAvatarUrl = document["avatarUrl"] as? String ?? ""
+        let existingCreatedCapsulesIds = document["createdCapsulesIds"] as? [String] ?? []
+        let existingReceivedCapsulesIds = document["receivedCapsulesIds"] as? [String] ?? []
+        let existingSharedCapsulesIds = document["sharedCapsulesIds"] as? [String] ?? []
+        let existingFriends = document["friends"] as? [Friend] ?? []
+
+        UserDefaults.standard.set(existingName, forKey: "userFullName")
+
+        let user = User(
+            id: uid,
+            email: existingEmail,
+            name: existingName,
+            avatarUrl: existingAvatarUrl,
+            createdCapsulesIds: existingCreatedCapsulesIds,
+            receivedCapsulesIds: existingReceivedCapsulesIds,
+            sharedCapsulesIds: existingSharedCapsulesIds,
+            friends: existingFriends,
+            userIdentifier: userIdentifier
+        )
+
+        print("Loaded existing user data from Firestore: \(user)")
+    }
+
+    private func createNewUser(uid: String, email: String, name: String, userIdentifier: String) {
+        let user = User(
+            id: uid,
+            email: email,
+            name: name,
+            avatarUrl: "",
+            createdCapsulesIds: [],
+            receivedCapsulesIds: [],
+            sharedCapsulesIds: [],
+            friends: [],
+            userIdentifier: userIdentifier
+        )
+
+        saveUserToFirestore(user: user)
     }
 
     // MARK: - Save user to Firestore
@@ -252,53 +264,6 @@ class LoginViewController: UIViewController {
     internal func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         print("Sign in with Apple failed: \(error)")
     }
-
-    // MARK: - Google Sign-In
-//        @objc private func handleGoogleSignIn() {
-//            GIDSignIn.sharedInstance.signIn(withPresenting: self) { user, error in
-//                if let error = error {
-//                    print("Google Sign In failed: \(error)")
-//                    return
-//                }
-//    
-//                guard let authentication = user?.authentication,
-//                      let idToken = authentication.idToken else {
-//                    print("Failed to get idToken from Google")
-//                    return
-//                }
-//    
-//                let credential = 
-//                GoogleAuthProvider.credential(withIDToken: idToken, accessToken: authentication.accessToken)
-//
-//                Auth.auth().signIn(with: credential) { (authResult, error) in
-//                    if let error = error {
-//                        print("Firebase Sign In with Google failed: \(error)")
-//                        return
-//                    }
-//    
-//                    guard let uid = authResult?.user.uid else { return }
-//    
-//                    let email = authResult?.user.email ?? "No Email"
-//                    let name = authResult?.user.displayName ?? "No Name"
-//                    let avatarUrl = user?.profile?.imageURL(withDimension: 200)?.absoluteString ?? ""
-//    
-//                    // Create a User object
-//                    let user = User(
-//                        id: uid,
-//                        email: email,
-//                        name: name,
-//                        avatarUrl: avatarUrl,
-//                        createdCapsulesIds: [],
-//                        receivedCapsulesIds: [],
-//                        sharedCapsulesIds: [],
-//                        userIdentifier: nil  // Google does not provide a userIdentifier
-//                    )
-//    
-//                    // Save to Firestore
-//                    self.saveUserToFirestore(user: user)
-//                }
-//            }
-//        }
 }
 
 extension LoginViewController: ASAuthorizationControllerDelegate,

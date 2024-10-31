@@ -46,7 +46,7 @@ class BirthYearViewController: UIViewController {
             datePicker.date = Calendar.current.date(byAdding: .year, value: -30, to: Date()) ?? Date()
         }
 
-        datePicker.tintColor = STColor.C1.uiColor
+        datePicker.tintColor = STColor.CC1.uiColor
         datePicker.backgroundColor = .white.withAlphaComponent(0.3)
         datePicker.layer.cornerRadius = 10
         datePicker.clipsToBounds = true
@@ -89,15 +89,18 @@ class BirthYearViewController: UIViewController {
 
     private func setupSaveButton() {
         let saveButton = UIButton(type: .system)
-        saveButton.setTitle("保存", for: .normal)
-        saveButton.setTitleColor(.white, for: .normal)
-        saveButton.tintColor = .white
-        saveButton.layer.cornerRadius = 8
-        saveButton.layer.borderColor = STColor.C1.uiColor.cgColor
-        saveButton.layer.borderWidth = 0.5
-        saveButton.backgroundColor = .white.withAlphaComponent(0.1)
 
-        saveButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
+        var config = UIButton.Configuration.filled()
+        config.title = "保存"
+        config.baseForegroundColor = .white
+        config.baseBackgroundColor = .white.withAlphaComponent(0.1)
+        config.cornerStyle = .medium
+        config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 20)
+
+        saveButton.configuration = config
+        saveButton.layer.borderColor = STColor.CC1.uiColor.cgColor
+        saveButton.layer.borderWidth = 0.5
+        saveButton.layer.cornerRadius = 10
 
         saveButton.addTarget(self, action: #selector(saveBirthDate), for: .touchUpInside)
 

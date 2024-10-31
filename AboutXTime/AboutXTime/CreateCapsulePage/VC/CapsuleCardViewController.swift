@@ -7,8 +7,6 @@
 
 import UIKit
 import SwiftUI
-import Foundation
-import Combine
 
 class CapsuleCardViewController: UIViewController, UINavigationControllerDelegate, UIGestureRecognizerDelegate {
 
