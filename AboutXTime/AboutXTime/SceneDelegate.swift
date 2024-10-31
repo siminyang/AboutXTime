@@ -78,9 +78,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     private func clearUserSession() {
         try? Auth.auth().signOut()
-
-//        KeychainManager.standard.delete(service: "com.aboutXTime.service", account: "appleUserIdentifier")
-
         UserDefaults.standard.removeObject(forKey: "userUID")
         UserDefaults.standard.removeObject(forKey: "userFullName")
     }

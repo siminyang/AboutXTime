@@ -23,12 +23,26 @@ struct CustomTextEditor: UIViewRepresentable {
         toolbar.sizeToFit()
 
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+
         let doneButton = UIBarButtonItem(
             title: "Done",
             style: .done,
             target: context.coordinator,
             action: #selector(context.coordinator.doneButtonTapped)
         )
+
+        let buttonFont = UIFont.systemFont(ofSize: 17, weight: .semibold)
+
+        doneButton.setTitleTextAttributes([
+            .foregroundColor: UIColor.systemBlue,
+            .font: buttonFont
+        ], for: .normal)
+
+        doneButton.setTitleTextAttributes([
+            .foregroundColor: UIColor.gray,
+            .font: buttonFont
+        ], for: .highlighted)
+
         toolbar.setItems([flexibleSpace, doneButton], animated: true)
 
         textView.inputAccessoryView = toolbar
@@ -129,10 +143,6 @@ struct CustomTextField: UIViewRepresentable {
         textField.layer.cornerRadius = 10
         textField.clipsToBounds = true
 
-        if #available(iOS 13.0, *) {
-            textField.overrideUserInterfaceStyle = .light
-        }
-
         let toolbar = UIToolbar()
         toolbar.sizeToFit()
 
@@ -147,6 +157,18 @@ struct CustomTextField: UIViewRepresentable {
             target: context.coordinator,
             action: #selector(Coordinator.doneButtonTapped)
         )
+
+        let buttonFont = UIFont.systemFont(ofSize: 17, weight: .semibold)
+
+        doneButton.setTitleTextAttributes([
+            .foregroundColor: UIColor.systemBlue,
+            .font: buttonFont
+        ], for: .normal)
+
+        doneButton.setTitleTextAttributes([
+            .foregroundColor: UIColor.gray,
+            .font: buttonFont
+        ], for: .highlighted)
 
         toolbar.items = [flexibleSpace, doneButton]
         textField.inputAccessoryView = toolbar
@@ -240,6 +262,18 @@ struct CustomIdTextField: UIViewRepresentable {
             target: context.coordinator,
             action: #selector(Coordinator.doneButtonTapped)
         )
+
+        let buttonFont = UIFont.systemFont(ofSize: 17, weight: .semibold)
+
+        doneButton.setTitleTextAttributes([
+            .foregroundColor: UIColor.systemBlue,
+            .font: buttonFont
+        ], for: .normal)
+
+        doneButton.setTitleTextAttributes([
+            .foregroundColor: UIColor.gray,
+            .font: buttonFont
+        ], for: .highlighted)
 
         toolbar.items = [flexibleSpace, doneButton]
         textField.inputAccessoryView = toolbar
@@ -338,6 +372,18 @@ struct CustomReplyTextEditor: UIViewRepresentable {
             target: context.coordinator,
             action: #selector(Coordinator.doneButtonTapped)
         )
+
+        let buttonFont = UIFont.systemFont(ofSize: 17, weight: .semibold)
+
+        doneButton.setTitleTextAttributes([
+            .foregroundColor: UIColor.systemBlue,
+            .font: buttonFont
+        ], for: .normal)
+
+        doneButton.setTitleTextAttributes([
+            .foregroundColor: UIColor.gray,
+            .font: buttonFont
+        ], for: .highlighted)
 
         toolbar.items = [flexibleSpace, doneButton]
         toolbar.isUserInteractionEnabled = true

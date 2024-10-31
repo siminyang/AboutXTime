@@ -8,7 +8,6 @@
 import UIKit
 import SwiftUI
 import NVActivityIndicatorView
-import Combine
 
 class SearchViewController: UIViewController {
 
@@ -48,6 +47,26 @@ class SearchViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        if let navigationBar = navigationController?.navigationBar {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithTransparentBackground()
+
+            let backButtonAppearance = UIBarButtonItemAppearance()
+            backButtonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.clear]
+            appearance.backButtonAppearance = backButtonAppearance
+
+            let buttonAppearance = UIBarButtonItemAppearance()
+            buttonAppearance.normal.titleTextAttributes = [.foregroundColor: STColor.CC1.color]
+            appearance.buttonAppearance = buttonAppearance
+
+            navigationBar.standardAppearance = appearance
+            navigationBar.scrollEdgeAppearance = appearance
+            navigationBar.compactAppearance = appearance
+            navigationBar.isTranslucent = false
+            navigationBar.backgroundColor = .black
+        }
+        let backButton = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = backButton
 
         tabBarController?.tabBar.isHidden = false
     }

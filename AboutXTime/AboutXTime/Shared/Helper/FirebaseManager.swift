@@ -11,9 +11,39 @@ import FirebaseStorage
 
 class FirebaseManager {
     static let shared = FirebaseManager()
-    let firestore = Firestore.firestore()
-    private let storage = Storage.storage()
-    private init() {}
+    let firestore: Firestore
+    let storage: Storage
+
+    private init() {
+        self.firestore = Firestore.firestore()
+        self.storage = Storage.storage()
+    }
+
+    func fetchDocument(collection: String,
+                       documentID: String,
+                       completion: @escaping (Result<DocumentSnapshot, Error>) -> Void) {
+        let documentRef = firestore.collection(collection).document(documentID)
+        documentRef.getDocument { document, error in
+            if let error = error {
+                completion(.failure(error))
+            } else if let document = document, document.exists {
+                completion(.success(document))
+            } else {
+                completion(.failure(NSError(domain: "Document does not exist", code: 404, userInfo: nil)))
+            }
+        }
+    }
+
+    // 儲存資料的方法
+    func saveData(collection: String,
+                  documentID: String,
+                  data: [String: Any],
+                  completion: @escaping (Error?) -> Void) {
+        let documentRef = firestore.collection(collection).document(documentID)
+        documentRef.setData(data, merge: true) { error in
+            completion(error)
+        }
+    }
 }
 
 // MARK: - Capsule fetching Operations
@@ -30,7 +60,9 @@ extension FirebaseManager {
     }
 
     @discardableResult
-    func fetchUserCapsules(userId: String, completion: @escaping (Result<[Capsule], Error>) -> Void) -> ListenerRegistration {
+    func fetchUserCapsules(userId: String,
+                           completion: @escaping (Result<[Capsule], Error>) -> Void)
+    -> ListenerRegistration {
         print("正在獲取 userId 為 \(userId) 的膠囊")
 
         let query = firestore.collection(Constant.capsules)
@@ -73,7 +105,8 @@ extension FirebaseManager {
 
                 let recipients = [Recipient(id: userId, status: status)]
 
-                let content = (data["content"] as? [String: [String: Any]])?.compactMap { (contentUserId, contentData) -> Content? in
+                let content =
+                (data["content"] as? [String: [String: Any]])?.compactMap { (contentUserId, contentData) -> Content? in
                     guard let text = contentData["text"] as? String else { return nil }
                     return Content(imgUrl: contentData["imgUrl"] as? String,
                                    text: text,
@@ -97,7 +130,8 @@ extension FirebaseManager {
                     location = nil
                 }
 
-                let replyMessages: [ReplyMessage] = (data["replyMessages"] as? [[String: Any]])?.compactMap { replyData in
+                let replyMessages: [ReplyMessage] =
+                (data["replyMessages"] as? [[String: Any]])?.compactMap { replyData in
                     guard let replyUserId = replyData["userId"] as? String,
                           let replyText = replyData["text"] as? String,
                           let replyCreatedTimeTimestamp = replyData["createdTime"] as? Timestamp,
@@ -132,7 +166,8 @@ extension FirebaseManager {
     }
 
     // 指定的單顆膠囊
-    func addCapsuleListener(capsuleId: String, completion: @escaping (Result<Capsule, Error>) -> Void) -> ListenerRegistration {
+    func addCapsuleListener(capsuleId: String, completion: @escaping (Result<Capsule, Error>) -> Void)
+    -> ListenerRegistration {
         let capsuleRef = firestore.collection(Constant.capsules).document(capsuleId)
         let listener = capsuleRef.addSnapshotListener { snapshot, error in
             if let error = error {
@@ -165,7 +200,8 @@ extension FirebaseManager {
                 return Recipient(id: key, status: status)
             }
 
-            let content = (data["content"] as? [String: [String: Any]])?.compactMap { (contentUserId, contentData) -> Content? in
+            let content = (data["content"] as? [String: [String: Any]])?.compactMap { (contentUserId, contentData)
+                -> Content? in
                 guard let text = contentData["text"] as? String else { return nil }
                 return Content(
                     imgUrl: contentData["imgUrl"] as? String,
@@ -283,7 +319,9 @@ extension FirebaseManager {
         }
     }
 
-    func addReplyToCapsule(capsuleId: String, reply: ReplyMessage, completion: @escaping (Result<Void, Error>) -> Void) {
+    func addReplyToCapsule(capsuleId: String,
+                           reply: ReplyMessage,
+                           completion: @escaping (Result<Void, Error>) -> Void) {
         let capsuleRef = firestore.collection(Constant.capsules).document(capsuleId)
 
         let replyData: [String: Any] = [
@@ -305,15 +343,26 @@ extension FirebaseManager {
     }
 
     // 更新膠囊內容
-    func updateCapsuleContent(capsuleId: String, updateInfo: CapsuleUpdateInfo, imageTagLabels: [Int], completion: @escaping (Result<Void, Error>) -> Void) {
+    func updateCapsuleContent(capsuleId: String,
+                              updateInfo: CapsuleUpdateInfo,
+                              imageTagLabels: [Int],
+                              completion: @escaping (Result<Void, Error>) -> Void) {
         let capsuleRef = firestore.collection(Constant.capsules).document(capsuleId)
 
         guard let userId = UserDefaults.standard.string(forKey: "userUID") else {
-            completion(.failure(NSError(domain: "UserDefaults Error", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get UID"])))
+            completion(.failure(
+                NSError(domain: "UserDefaults Error",
+                        code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "Failed to get UID"]))
+            )
             return
         }
 
-        let dataToUpdate = prepareCapsuleUpdateData(capsuleId: capsuleId, userId: userId, updateInfo: updateInfo, imageTagLabels: imageTagLabels)
+        let dataToUpdate =
+        prepareCapsuleUpdateData(capsuleId: capsuleId,
+                                 userId: userId,
+                                 updateInfo: updateInfo,
+                                 imageTagLabels: imageTagLabels)
 
         capsuleRef.updateData(dataToUpdate) { error in
             if let error = error {
@@ -321,9 +370,12 @@ extension FirebaseManager {
                 return
             }
 
-            self.updateUserCapsuleLists(userId: userId, recipientId: updateInfo.recipient, capsuleId: capsuleId, updateInfo: updateInfo) { result in
+            self.updateUserCapsuleLists(userId: userId,
+                                        recipientId: updateInfo.recipient,
+                                        capsuleId: capsuleId,
+                                        updateInfo: updateInfo) { result in
                 switch result {
-                case .success():
+                case .success:
                     completion(.success(()))
                 case .failure(let error):
                     completion(.failure(error))
@@ -333,7 +385,10 @@ extension FirebaseManager {
     }
 
     // 準備要更新的膠囊資料
-    private func prepareCapsuleUpdateData(capsuleId: String, userId: String, updateInfo: CapsuleUpdateInfo, imageTagLabels: [Int]) -> [String: Any] {
+    private func prepareCapsuleUpdateData(capsuleId: String,
+                                          userId: String,
+                                          updateInfo: CapsuleUpdateInfo,
+                                          imageTagLabels: [Int]) -> [String: Any] {
         var dataToUpdate: [String: Any] = [
             "capsuleId": capsuleId,
             "content.\(userId)": [
@@ -356,7 +411,8 @@ extension FirebaseManager {
 
         if let location = updateInfo.location {
             dataToUpdate["location"] = [
-                "LatitudeAndLongitude": GeoPoint(latitude: location.latitude ?? 0.0, longitude: location.longitude ?? 0.0),
+                "LatitudeAndLongitude": GeoPoint(latitude: location.latitude ?? 0.0,
+                                                 longitude: location.longitude ?? 0.0),
                 "radius": location.radius ?? 0.0 as Any
             ]
         }
@@ -367,7 +423,11 @@ extension FirebaseManager {
     }
 
     // 更新使用者的膠囊列表
-    private func updateUserCapsuleLists(userId: String, recipientId: String, capsuleId: String, updateInfo: CapsuleUpdateInfo, completion: @escaping (Result<Void, Error>) -> Void) {
+    private func updateUserCapsuleLists(userId: String,
+                                        recipientId: String,
+                                        capsuleId: String,
+                                        updateInfo: CapsuleUpdateInfo,
+                                        completion: @escaping (Result<Void, Error>) -> Void) {
         let userRef = firestore.collection(Constant.users).document(userId)
 
         userRef.updateData([
@@ -382,8 +442,12 @@ extension FirebaseManager {
             if recipientId != userId {
                 self.updateFriendsList(userId: userId, recipientId: recipientId, updateInfo: updateInfo) { result in
                     switch result {
-                    case .success():
-                        self.updateRecipientCapsuleList(userId: userId, recipientId: recipientId, capsuleId: capsuleId, updateInfo: updateInfo, completion: completion)
+                    case .success:
+                        self.updateRecipientCapsuleList(userId: userId,
+                                                        recipientId: recipientId,
+                                                        capsuleId: capsuleId,
+                                                        updateInfo: updateInfo,
+                                                        completion: completion)
                     case .failure(let error):
                         completion(.failure(error))
                     }
@@ -391,7 +455,7 @@ extension FirebaseManager {
             } else {
                 self.addCapsuleToReceivedList(userId: userId, capsuleId: capsuleId) { result in
                     switch result {
-                    case .success():
+                    case .success:
                         completion(.success(()))
                     case .failure(let error):
                         completion(.failure(error))
@@ -401,7 +465,9 @@ extension FirebaseManager {
         }
     }
 
-    func addCapsuleToReceivedList(userId: String, capsuleId: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    func addCapsuleToReceivedList(userId: String,
+                                  capsuleId: String,
+                                  completion: @escaping (Result<Void, Error>) -> Void) {
         let userRef = firestore.collection("users").document(userId)
 
         userRef.updateData([
@@ -430,15 +496,22 @@ extension FirebaseManager {
 
 // MARK: - Capsule media update operations
 extension FirebaseManager {
-    func uploadImage(_ image: UIImage, capsuleId: String, userId: String, completion: @escaping (Result<String, Error>) -> Void) {
+    func uploadImage(_ image: UIImage,
+                     capsuleId: String,
+                     userId: String,
+                     completion: @escaping (Result<String, Error>) -> Void) {
         guard let imageData = image.jpegData(compressionQuality: 1) else {
-            completion(.failure(NSError(domain: "ImageError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to data"])))
+            completion(.failure(
+                NSError(domain: "ImageError",
+                        code: 0,
+                        userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to data"]))
+            )
             return
         }
 
         let imageRef = storage.reference().child("images/\(capsuleId)/\(userId).jpg")
 
-        imageRef.putData(imageData, metadata: nil) { metadata, error in
+        imageRef.putData(imageData, metadata: nil) { _, error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -453,13 +526,16 @@ extension FirebaseManager {
         }
     }
 
-    func uploadAudio(url: URL, capsuleId: String, userId: String ,completion: @escaping (Result<String, Error>) -> Void) {
+    func uploadAudio(url: URL,
+                     capsuleId: String,
+                     userId: String,
+                     completion: @escaping (Result<String, Error>) -> Void) {
         let audioRef = storage.reference().child("audio/\(capsuleId)/\(userId).m4a")
 
         let metadata = StorageMetadata()
         metadata.contentType = "audio/m4a"
 
-        audioRef.putFile(from: url, metadata: metadata) { metadata, error in
+        audioRef.putFile(from: url, metadata: metadata) { _, error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -474,10 +550,13 @@ extension FirebaseManager {
         }
     }
 
-    func uploadVideo(url: URL, capsuleId: String, userId: String, completion: @escaping (Result<String, Error>) -> Void) {
+    func uploadVideo(url: URL,
+                     capsuleId: String,
+                     userId: String,
+                     completion: @escaping (Result<String, Error>) -> Void) {
         let videoRef = storage.reference().child("videos/\(capsuleId)/\(userId).mp4")
 
-        videoRef.putFile(from: url, metadata: nil) { metadata, error in
+        videoRef.putFile(from: url, metadata: nil) { _, error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -517,22 +596,25 @@ extension FirebaseManager {
 
                 // 合併陣列字段
                 if let createdCapsules = existingData["createdCapsulesIds"] as? [String] {
-                    existingData["createdCapsulesIds"] = Array(Set(createdCapsules + (newData["createdCapsulesIds"] as? [String] ?? [])))
+                    existingData["createdCapsulesIds"] =
+                    Array(Set(createdCapsules + (newData["createdCapsulesIds"] as? [String] ?? [])))
                 }
                 if let receivedCapsules = existingData["receivedCapsulesIds"] as? [String] {
-                    existingData["receivedCapsulesIds"] = Array(Set(receivedCapsules + (newData["receivedCapsulesIds"] as? [String] ?? [])))
+                    existingData["receivedCapsulesIds"] =
+                    Array(Set(receivedCapsules + (newData["receivedCapsulesIds"] as? [String] ?? [])))
                 }
                 if let sharedCapsules = existingData["sharedCapsulesIds"] as? [String] {
-                    existingData["sharedCapsulesIds"] = Array(Set(sharedCapsules + (newData["sharedCapsulesIds"] as? [String] ?? [])))
+                    existingData["sharedCapsulesIds"] =
+                    Array(Set(sharedCapsules + (newData["sharedCapsulesIds"] as? [String] ?? [])))
                 }
 
                 // 合併 friends
-                if let existingFriends = existingData["friends"] as? [[String: Any]], let newFriends = newData["friends"] as? [[String: Any]] {
+                if let existingFriends = existingData["friends"] as? [[String: Any]],
+                   let newFriends = newData["friends"] as? [[String: Any]] {
                     var mergedFriends = existingFriends
-                    for friend in newFriends {
-                        if !mergedFriends.contains(where: { ($0["id"] as? String) == friend["id"] as? String }) {
+                    for friend in newFriends
+                    where !mergedFriends.contains(where: { ($0["id"] as? String) == friend["id"] as? String }) {
                             mergedFriends.append(friend)
-                        }
                     }
                     existingData["friends"] = mergedFriends
                 }
@@ -563,7 +645,10 @@ extension FirebaseManager {
 // MARK: - Friend Data Operations
 extension FirebaseManager {
     // 更新自己朋友列表
-    private func updateFriendsList(userId: String, recipientId: String, updateInfo: CapsuleUpdateInfo, completion: @escaping (Result<Void, Error>) -> Void) {
+    private func updateFriendsList(userId: String,
+                                   recipientId: String,
+                                   updateInfo: CapsuleUpdateInfo,
+                                   completion: @escaping (Result<Void, Error>) -> Void) {
         let userRef = firestore.collection(Constant.users).document(userId)
 
         userRef.getDocument { document, error in
@@ -573,8 +658,10 @@ extension FirebaseManager {
                 return
             }
 
-            guard let document = document, document.exists, var friends = document.data()?["friends"] as? [[String: Any]] else {
-                completion(.failure(NSError(domain: "Document Error", code: -1, userInfo: [NSLocalizedDescriptionKey: "Document does not exist"])))
+            guard let document = document, document.exists,
+                  var friends = document.data()?["friends"] as? [[String: Any]] else {
+                completion(.failure(NSError(domain: "Document Error", code: -1,
+                                            userInfo: [NSLocalizedDescriptionKey: "Document does not exist"])))
                 return
             }
 
@@ -606,7 +693,11 @@ extension FirebaseManager {
     }
 
     // 更新對方的膠囊列表
-    private func updateRecipientCapsuleList(userId: String, recipientId: String, capsuleId: String, updateInfo: CapsuleUpdateInfo, completion: @escaping (Result<Void, Error>) -> Void) {
+    private func updateRecipientCapsuleList(userId: String,
+                                            recipientId: String,
+                                            capsuleId: String,
+                                            updateInfo: CapsuleUpdateInfo,
+                                            completion: @escaping (Result<Void, Error>) -> Void) {
         let recipientRef = firestore.collection(Constant.users).document(recipientId)
 
         recipientRef.getDocument { document, error in
@@ -615,20 +706,29 @@ extension FirebaseManager {
                 return
             }
 
-            guard let document = document, document.exists, var recipientFriends = document.data()?["friends"] as? [[String: Any]] else {
-                completion(.failure(NSError(domain: "Recipient Document Error", code: -1, userInfo: [NSLocalizedDescriptionKey: "Recipient document does not exist"])))
+            guard let document = document, document.exists,
+                  var recipientFriends = document.data()?["friends"] as? [[String: Any]] else {
+                completion(.failure(
+                    NSError(domain: "Recipient Document Error",
+                            code: -1,
+                            userInfo: [NSLocalizedDescriptionKey: "Recipient document does not exist"]))
+                )
                 return
             }
 
             // 更新或新增對方的朋友資訊
             if let index = recipientFriends.firstIndex(where: { $0["id"] as? String == userId }) {
                 recipientFriends[index]["latestInteractionDate"] = Date()
-                recipientFriends[index]["fullName"] = updateInfo.content.fromWhom == "Unknown" ? UserDefaults.standard.string(forKey: "userFullName") ?? "" : updateInfo.content.fromWhom
+                recipientFriends[index]["fullName"] =
+                updateInfo.content.fromWhom ==
+                "Unknown" ? UserDefaults.standard.string(forKey: "userFullName") ?? "" : updateInfo.content.fromWhom
             } else {
                 let recipientFriendData: [String: Any] = [
                     "id": userId,
                     "latestInteractionDate": Date(),
-                    "fullName": updateInfo.content.fromWhom == "Unknown" ? UserDefaults.standard.string(forKey: "userFullName") ?? "" : updateInfo.content.fromWhom,
+                    "fullName": updateInfo.content.fromWhom ==
+                    "Unknown" ? 
+                    UserDefaults.standard.string(forKey: "userFullName") ?? "" : updateInfo.content.fromWhom,
                     "avatar": "planet\(Int.random(in: 1...18))"
                 ]
                 recipientFriends.append(recipientFriendData)
@@ -662,7 +762,15 @@ extension FirebaseManager {
             guard let document = document, document.exists,
                   var friends = document.data()?["friends"] as? [[String: Any]] else {
                 print("Document does not exist or friends data is not in correct format")
-                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Document does not exist or friends data is not in correct format"])))
+                completion(.failure(
+                    NSError(
+                        domain: "",
+                        code: -1,
+                        userInfo:
+                            [NSLocalizedDescriptionKey: 
+                                "Document does not exist or friends data is not in correct format"]
+                    ))
+                )
                 return
             }
 
@@ -683,7 +791,9 @@ extension FirebaseManager {
         }
     }
 
-    func fetchFriendData(currentUserId: String, friendId: String, completion: @escaping (Result<User, Error>) -> Void) {
+    func fetchFriendData(currentUserId: String,
+                         friendId: String,
+                         completion: @escaping (Result<User, Error>) -> Void) {
 
         let currentUserRef = firestore.collection(Constant.users).document(currentUserId)
 
@@ -697,8 +807,11 @@ extension FirebaseManager {
                   let data = document.data(),
                   let friendsArray = data["friends"] as? [[String: Any]] else {
                 print("Failed to fetch current user's friends list or list is empty.")
-                completion(.failure(NSError(domain: "", code: -1,
-                                            userInfo: [NSLocalizedDescriptionKey: "Failed to fetch current user's friends list"])))
+                completion(.failure(
+                    NSError(domain: "",
+                            code: -1,
+                            userInfo: [NSLocalizedDescriptionKey: "Failed to fetch current user's friends list"]))
+                )
                 return
             }
 
@@ -726,8 +839,10 @@ extension FirebaseManager {
                     completion(.success(user))
 
                 } else {
-                    completion(.failure(NSError(domain: "", code: -1,
-                                                userInfo: [NSLocalizedDescriptionKey: "Failed to initialize friend from dictionary"])))
+                    completion(.failure(NSError(domain: "",
+                                                code: -1,
+                                                userInfo: [NSLocalizedDescriptionKey:
+                                                            "Failed to initialize friend from dictionary"])))
                 }
                 return
             }

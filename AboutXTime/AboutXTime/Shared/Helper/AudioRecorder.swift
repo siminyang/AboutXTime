@@ -100,14 +100,14 @@ class AudioRecorder: NSObject, ObservableObject {
 
 extension AudioRecorder: AVAudioRecorderDelegate {
     func startRecording() {
-        let audioSession = AVAudioSession.sharedInstance()
-        switch audioSession.recordPermission {
+        let audioApplication = AVAudioApplication.shared
+        switch audioApplication.recordPermission {
         case .granted:
             beginRecording()
         case .denied:
             print("Audio recording permission denied.")
         case .undetermined:
-            audioSession.requestRecordPermission { [weak self] allowed in
+            AVAudioApplication.requestRecordPermission { [weak self] allowed in
                 if allowed {
                     self?.beginRecording()
                 } else {
@@ -219,7 +219,7 @@ extension AudioRecorder: AVAudioRecorderDelegate {
     }
 }
 
-extension AudioRecorder: AVAudioPlayerDelegate  {
+extension AudioRecorder: AVAudioPlayerDelegate {
     private func startPlaybackTimer() {
         playbackTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self = self, let player = self.audioPlayer else { return }

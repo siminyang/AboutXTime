@@ -41,7 +41,7 @@ class TabBarController: UITabBarController {
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor.black
 
-        appearance.stackedLayoutAppearance.selected.iconColor = STColor.C1.uiColor
+        appearance.stackedLayoutAppearance.selected.iconColor = STColor.CC1.uiColor
         appearance.stackedLayoutAppearance.selected.titleTextAttributes =
         [NSAttributedString.Key.foregroundColor: UIColor.white]
         appearance.stackedLayoutAppearance.normal.iconColor =

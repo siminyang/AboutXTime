@@ -22,10 +22,14 @@ class OnboardingViewController: UIPageViewController {
         delegate = self
 
         pages.append(createPage(title: "創建膠囊送給自己",
-                                description: "透過記錄和追蹤每一個重要時刻，無論是想法、目標還是成長歷程，幫助您重新認識自己，見證自己的成長與蛻變。這是一段陪伴您的旅程，讓未來的您更加自信且堅定！",
+                                description: """
+透過記錄和追蹤每一個重要時刻，無論是想法、目標還是成長歷程，幫助您重新認識自己，見證自己的成長與蛻變。這是一段陪伴您的旅程，讓未來的您更加自信且堅定！
+""",
                                 imageName: "planet4"))
         pages.append(createPage(title: "創建膠囊送給對方",
-                                description: "透過這個功能，您可以將最珍貴的情感瞬間保存下來，並在特別的時刻與對方分享。這是一個讓感情持續升溫的秘密武器，讓重要的關係不隨時間而淡去，而是隨著時光變得更加深厚。",
+                                description: """
+透過這個功能，您可以將最珍貴的情感瞬間保存下來，並在特別的時刻與對方分享。這是一個讓感情持續升溫的秘密武器，讓重要的關係不隨時間而淡去，而是隨著時光變得更加深厚。
+""",
                                 imageName: "planet3"))
         pages.append(createFinalPage())
 
@@ -33,7 +37,7 @@ class OnboardingViewController: UIPageViewController {
 
         let skipButton = UIButton(frame: CGRect(x: view.frame.width - 80, y: 50, width: 70, height: 30))
         skipButton.setTitle("跳過", for: .normal)
-        skipButton.setTitleColor(STColor.C1.uiColor, for: .normal)
+        skipButton.setTitleColor(STColor.CC1.uiColor, for: .normal)
         skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
         view.addSubview(skipButton)
 
@@ -127,87 +131,129 @@ class OnboardingViewController: UIPageViewController {
         let pageVC = UIViewController()
         pageVC.view.backgroundColor = .black
 
+        let titleLabel = createTitleLabel()
+        pageVC.view.addSubview(titleLabel)
+
+        let bgView = createBackgroundView()
+        pageVC.view.addSubview(bgView)
+
+        let descriptionLabel = createDescriptionLabel()
+        pageVC.view.addSubview(descriptionLabel)
+
+        let imageView = createImageView()
+        pageVC.view.addSubview(imageView)
+
+        let finishButton = createFinishButton()
+        pageVC.view.addSubview(finishButton)
+
+        let views = PageViews(pageVC: pageVC,
+                              titleLabel: titleLabel,
+                              bgView: bgView,
+                              descriptionLabel: descriptionLabel,
+                              imageView: imageView,
+                              finishButton: finishButton)
+
+        setupConstraints(for: views)
+
+        return pageVC
+    }
+
+    private struct PageViews {
+        let pageVC: UIViewController
+        let titleLabel: UILabel
+        let bgView: UIView
+        let descriptionLabel: UILabel
+        let imageView: UIImageView
+        let finishButton: UIButton
+    }
+
+    private func setupConstraints(for views: PageViews) {
+        NSLayoutConstraint.activate([
+            views.bgView.topAnchor.constraint(equalTo: views.descriptionLabel.topAnchor, constant: -20),
+            views.bgView.bottomAnchor.constraint(equalTo: views.descriptionLabel.bottomAnchor, constant: 20),
+            views.bgView.leadingAnchor.constraint(equalTo: views.descriptionLabel.leadingAnchor, constant: -20),
+            views.bgView.trailingAnchor.constraint(equalTo: views.descriptionLabel.trailingAnchor, constant: 20),
+
+            views.imageView.topAnchor.constraint(equalTo: views.pageVC.view.safeAreaLayoutGuide.topAnchor,
+                                                 constant: 50),
+            views.imageView.leadingAnchor.constraint(equalTo: views.pageVC.view.leadingAnchor, constant: 20),
+            views.imageView.trailingAnchor.constraint(equalTo: views.pageVC.view.trailingAnchor, constant: -20),
+            views.imageView.heightAnchor.constraint(equalToConstant: 200),
+
+            views.titleLabel.topAnchor.constraint(equalTo: views.imageView.bottomAnchor, constant: 60),
+            views.titleLabel.leadingAnchor.constraint(equalTo: views.pageVC.view.leadingAnchor, constant: 20),
+            views.titleLabel.trailingAnchor.constraint(equalTo: views.pageVC.view.trailingAnchor, constant: -20),
+
+            views.descriptionLabel.topAnchor.constraint(equalTo: views.titleLabel.bottomAnchor, constant: 60),
+            views.descriptionLabel.leadingAnchor.constraint(equalTo: views.pageVC.view.leadingAnchor, constant: 80),
+            views.descriptionLabel.trailingAnchor.constraint(equalTo: views.pageVC.view.trailingAnchor, constant: -80),
+
+            views.finishButton.topAnchor.constraint(equalTo: views.descriptionLabel.bottomAnchor, constant: 80),
+            views.finishButton.centerXAnchor.constraint(equalTo: views.pageVC.view.centerXAnchor),
+            views.finishButton.widthAnchor.constraint(equalToConstant: 200),
+            views.finishButton.heightAnchor.constraint(equalToConstant: 50)
+        ])
+    }
+
+    private func createTitleLabel() -> UILabel {
         let titleLabel = UILabel()
         titleLabel.text = "與多位好友共同創建"
         titleLabel.font = UIFont.boldSystemFont(ofSize: 24)
         titleLabel.textColor = STColor.CC2.uiColor
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        pageVC.view.addSubview(titleLabel)
+        return titleLabel
+    }
 
+    private func createBackgroundView() -> UIView {
         let bgView = UIView()
         bgView.backgroundColor = UIColor.white.withAlphaComponent(0.1)
         bgView.layer.cornerRadius = 20
         bgView.translatesAutoresizingMaskIntoConstraints = false
-        pageVC.view.addSubview(bgView)
+        return bgView
+    }
 
+    private func createDescriptionLabel() -> UILabel {
         let descriptionLabel = UILabel()
         let descriptionText = "與好友們一起創造專屬的回憶膠囊，將每一個有趣、溫暖的時刻鎖住。未來某天一起開啟，喚起那些被時間藏起來的回憶，增強彼此的連結，為友情添上更多驚喜和感動！"
 
         let attributedString = NSMutableAttributedString(string: descriptionText)
         let paragraphStyle = NSMutableParagraphStyle()
-
         paragraphStyle.lineSpacing = 5
 
         attributedString.addAttribute(.paragraphStyle,
                                       value: paragraphStyle,
-                                      range: NSRange(location: 0, length: descriptionText.count))
-
+                                      range: NSRange(location: 0,
+                                                     length: descriptionText.count))
         attributedString.addAttribute(.kern, value: 1.2, range: NSRange(location: 0, length: descriptionText.count))
 
         descriptionLabel.attributedText = attributedString
-
         descriptionLabel.font = UIFont.systemFont(ofSize: 16)
         descriptionLabel.textColor = .white
         descriptionLabel.numberOfLines = 0
         descriptionLabel.textAlignment = .left
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        return descriptionLabel
+    }
 
-        pageVC.view.addSubview(descriptionLabel)
-
+    private func createImageView() -> UIImageView {
         let imageView = UIImageView(image: UIImage(named: "planet5"))
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        pageVC.view.addSubview(imageView)
+        return imageView
+    }
 
+    private func createFinishButton() -> UIButton {
         let finishButton = UIButton(type: .system)
         finishButton.setTitle("開始使用", for: .normal)
         finishButton.backgroundColor = UIColor.white.withAlphaComponent(0.1)
-        finishButton.layer.borderColor = STColor.C1.uiColor.cgColor
+        finishButton.layer.borderColor = STColor.CC1.uiColor.cgColor
         finishButton.layer.borderWidth = 1
         finishButton.setTitleColor(.white, for: .normal)
         finishButton.layer.cornerRadius = 10
         finishButton.translatesAutoresizingMaskIntoConstraints = false
         finishButton.addTarget(self, action: #selector(finishTapped), for: .touchUpInside)
-        pageVC.view.addSubview(finishButton)
-
-        NSLayoutConstraint.activate([
-
-            bgView.topAnchor.constraint(equalTo: descriptionLabel.topAnchor, constant: -20),
-            bgView.bottomAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 20),
-            bgView.leadingAnchor.constraint(equalTo: descriptionLabel.leadingAnchor, constant: -20),
-            bgView.trailingAnchor.constraint(equalTo: descriptionLabel.trailingAnchor, constant: 20),
-
-            imageView.topAnchor.constraint(equalTo: pageVC.view.safeAreaLayoutGuide.topAnchor, constant: 50),
-            imageView.leadingAnchor.constraint(equalTo: pageVC.view.leadingAnchor, constant: 20),
-            imageView.trailingAnchor.constraint(equalTo: pageVC.view.trailingAnchor, constant: -20),
-            imageView.heightAnchor.constraint(equalToConstant: 200),
-
-            titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 60),
-            titleLabel.leadingAnchor.constraint(equalTo: pageVC.view.leadingAnchor, constant: 20),
-            titleLabel.trailingAnchor.constraint(equalTo: pageVC.view.trailingAnchor, constant: -20),
-
-            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 60),
-            descriptionLabel.leadingAnchor.constraint(equalTo: pageVC.view.leadingAnchor, constant: 80),
-            descriptionLabel.trailingAnchor.constraint(equalTo: pageVC.view.trailingAnchor, constant: -80),
-
-            finishButton.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 80),
-            finishButton.centerXAnchor.constraint(equalTo: pageVC.view.centerXAnchor),
-            finishButton.widthAnchor.constraint(equalToConstant: 200),
-            finishButton.heightAnchor.constraint(equalToConstant: 50)
-        ])
-
-        return pageVC
+        return finishButton
     }
 
     @objc private func finishTapped() {
@@ -218,8 +264,8 @@ class OnboardingViewController: UIPageViewController {
         pageControl.numberOfPages = pages.count
         pageControl.currentPage = 0
         pageControl.translatesAutoresizingMaskIntoConstraints = false
-        pageControl.currentPageIndicatorTintColor = STColor.C1.uiColor
-        pageControl.pageIndicatorTintColor = STColor.C1.uiColor.withAlphaComponent(0.3)
+        pageControl.currentPageIndicatorTintColor = STColor.CC1.uiColor
+        pageControl.pageIndicatorTintColor = STColor.CC1.uiColor.withAlphaComponent(0.3)
         view.addSubview(pageControl)
 
         NSLayoutConstraint.activate([

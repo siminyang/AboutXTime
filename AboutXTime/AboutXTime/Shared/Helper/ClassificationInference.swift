@@ -56,7 +56,9 @@ class ClassificationInference {
                    let labelIndex = labelMapping[bestClass] {
                     detectedLabelIndices.append(labelIndex)
                     print(
-                        "Detected \(bestClass) as index \(labelIndex) with confidence \(observation.labels.first!.confidence * 100)%"
+                        """
+Detected \(bestClass) as index \(labelIndex) with confidence \(observation.labels.first!.confidence * 100)%
+"""
                     )
                 }
             }

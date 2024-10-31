@@ -11,7 +11,7 @@ import SwiftUI
 struct ShowCapsuleReplyPopupView: View {
     @ObservedObject var viewModel: CapsuleViewModel
     var dismissAction: () -> Void
-    @State private var offset: CGFloat = 0  // 用来追踪手势的偏移量
+    @State private var offset: CGFloat = 0
     @State private var keyboardHeight: CGFloat = 0
     @AppStorage("userAvatar") private var avatarKey: String = "planet4"
     @State private var contentHeight: CGFloat = 0
@@ -96,13 +96,13 @@ struct ShowCapsuleReplyPopupView: View {
                                 print("========================================按下送出")
                                 viewModel.addReply()
                                 hideKeyboard()
-                            }) {
+                            }, label: {
                                 Image(systemName: "paperplane.fill")
                                     .padding()
                                     .foregroundColor(.gray)
                                     .frame(width: 40, height: 40)
                                     .cornerRadius(8)
-                            }
+                            })
                         }
                         .padding(.top, 10)
                         .padding(.bottom, 20)
@@ -121,7 +121,7 @@ struct ShowCapsuleReplyPopupView: View {
             .gesture(
                 DragGesture()
                     .onChanged { gesture in
-                        if gesture.translation.height > 0 { // 向下拖曳
+                        if gesture.translation.height > 0 {
                             offset = gesture.translation.height
                         }
                     }

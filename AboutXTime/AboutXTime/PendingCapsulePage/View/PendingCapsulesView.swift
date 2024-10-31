@@ -88,6 +88,10 @@ struct PendingCapsulesView: View {
         }
     }
 
+    func getFilteredCapsules() -> [Capsule] {
+        return filteredCapsules
+    }
+
     private var filteredCapsules: [Capsule] {
         return capsules
             .filter { capsule in
@@ -95,7 +99,7 @@ struct PendingCapsulesView: View {
             }
             .sorted { $0.openDate < $1.openDate }
             .prefix(10)
-            .map { $0 } // Convert the result to an array
+            .map { $0 }
     }
 
     private func generateNonOverlappingPositions(for capsules: [Capsule], in geometry: GeometryProxy) {
@@ -108,7 +112,7 @@ struct PendingCapsulesView: View {
         let minY = safeAreaInsets.top
         let maxY = geometry.size.height - safeAreaInsets.bottom - 150
 
-        for (index, _) in capsules.enumerated() {
+        for index in capsules.indices {
             var bubbleSize = CGFloat.random(in: 100...150)
             var newPosition: CGPoint
             var positionIsValid = false

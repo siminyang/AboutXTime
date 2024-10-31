@@ -70,7 +70,7 @@ struct ShowCapsulePageView: View {
                             withAnimation {
                                 showReplyPopup.toggle()
                             }
-                        }) {
+                        }, label: {
                             HStack {
                                 Spacer()
                                 Image(systemName: "message.fill")
@@ -89,9 +89,9 @@ struct ShowCapsulePageView: View {
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(STColor.C1.color.opacity(0.5), lineWidth: 2)
+                                    .stroke(STColor.CC1.color.opacity(0.5), lineWidth: 2)
                             )
-                        }
+                        })
                         .padding(.horizontal)
 
                         Spacer()
@@ -105,7 +105,7 @@ struct ShowCapsulePageView: View {
                 .onAppear {
                     viewModel.startListening()
                     setupKeyboardObservers()
-                    updateCapsuleStatus()
+                    viewModel.updateCapsuleStatus()
                 }
                 .onDisappear {
                     viewModel.stopListening()
@@ -130,17 +130,6 @@ struct ShowCapsulePageView: View {
                         showReplyPopup = false
                     }
                 }
-            }
-        }
-    }
-
-    private func updateCapsuleStatus() {
-        FirebaseManager.shared.updateCapsuleStatus(capsuleId: capsule.capsuleId, status: 1) { result in
-            switch result {
-            case .success:
-                print("膠囊狀態更新成功")
-            case .failure(let error):
-                print("膠囊狀態更新失敗: \(error.localizedDescription)")
             }
         }
     }

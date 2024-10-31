@@ -33,8 +33,6 @@ class CreateCapsulesViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-//        view.backgroundColor = .black
-//        title = "創建膠囊"
 
         setupUI()
     }
@@ -43,7 +41,7 @@ class CreateCapsulesViewController: UIViewController {
 
         let backButton = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         navigationItem.backBarButtonItem = backButton
-        navigationController?.navigationBar.tintColor = STColor.C1.uiColor.withAlphaComponent(0.5)
+        navigationController?.navigationBar.tintColor = STColor.CC1.uiColor.withAlphaComponent(0.5)
 
         view.addSubview(stackView)
 
@@ -72,7 +70,7 @@ class CreateCapsulesViewController: UIViewController {
         for type in viewModel.capsuleTypes {
             let button = UIButton(type: .system)
             button.setTitle(type.title, for: .normal)
-            button.backgroundColor = STColor.C1.uiColor.withAlphaComponent(0.2)
+            button.backgroundColor = STColor.CC1.uiColor.withAlphaComponent(0.2)
             button.layer.borderColor = UIColor.white.cgColor
             button.layer.borderWidth = 0.5
             button.setTitleColor(.white, for: .normal)

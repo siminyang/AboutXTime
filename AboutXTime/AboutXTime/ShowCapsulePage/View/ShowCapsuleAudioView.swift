@@ -19,7 +19,7 @@ struct ShowCapsuleAudioView: View {
                     // Play/Pause Button
                     Button(action: {
                         audioRecorder.playAudio(url: url)
-                    }) {
+                    }, label: {
                         ZStack {
                             ActivityIndicatorView(type: .lineScaleParty,
                                                   color: .white,
@@ -34,7 +34,7 @@ struct ShowCapsuleAudioView: View {
                                 .opacity(audioRecorder.isAudioPlaying ? 0 : 1)
                         }
                         .padding()
-                    }
+                    })
                     .background(Color.white.opacity(0.1))
                     .foregroundColor(.white)
                     .cornerRadius(8)

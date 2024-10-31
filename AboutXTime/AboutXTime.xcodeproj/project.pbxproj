@@ -42,9 +42,10 @@
 		3C30AF9C2CB8D5DE00446BA4 /* CryptoUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C30AF9B2CB8D5DE00446BA4 /* CryptoUtils.swift */; };
 		3C30AF9F2CBCAB4A00446BA4 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C30AF9E2CBCAB4A00446BA4 /* OnboardingViewController.swift */; };
 		3C30AFA22CBCE66E00446BA4 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 3C30AFA12CBCE66E00446BA4 /* FirebaseCrashlytics */; };
-		3C30AFA72CBD46FA00446BA4 /* NVActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 3C30AFA62CBD46FA00446BA4 /* NVActivityIndicatorView */; };
-		3C30AFA92CBD46FA00446BA4 /* NVActivityIndicatorViewExtended in Frameworks */ = {isa = PBXBuildFile; productRef = 3C30AFA82CBD46FA00446BA4 /* NVActivityIndicatorViewExtended */; };
 		3C30AFB22CC0D14500446BA4 /* ExtensionTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C30AFB12CC0D14400446BA4 /* ExtensionTabBar.swift */; };
+		3C7DEEE62CC624D4005E6A10 /* AboutXTimeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7DEEE52CC624D4005E6A10 /* AboutXTimeUITests.swift */; };
+		3C7DF0932CCFC783005E6A10 /* NVActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 3C7DEEF32CCF8DCE005E6A10 /* NVActivityIndicatorView */; };
+		3C7DF0942CCFC783005E6A10 /* NVActivityIndicatorViewExtended in Frameworks */ = {isa = PBXBuildFile; productRef = 3C7DEEF52CCF8DCE005E6A10 /* NVActivityIndicatorViewExtended */; };
 		3C8BDADD2C96DFAB00567697 /* PendingCapsulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C8BDADC2C96DFAB00567697 /* PendingCapsulesView.swift */; };
 		3C8BDADF2C96DFBE00567697 /* CapsuleBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C8BDADE2C96DFBE00567697 /* CapsuleBubbleView.swift */; };
 		3C8BDAE12C96E02F00567697 /* ShowCapsulePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C8BDAE02C96E02F00567697 /* ShowCapsulePageViewController.swift */; };
@@ -99,6 +100,16 @@
 		3CFEDF6E2C941BEA00BBD2BC /* SettingsCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CFEDF6D2C941BE900BBD2BC /* SettingsCardView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		3C7DEEE72CC624D4005E6A10 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3CF4CFDB2C92B9CA00E81916 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3CF4CFE22C92B9CA00E81916;
+			remoteInfo = AboutXTime;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		3C00871E2CAB96AE00181FBE /* ActivityIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorView.swift; sourceTree = "<group>"; };
 		3C0087292CABD2B000181FBE /* CustomTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextEditor.swift; sourceTree = "<group>"; };
@@ -131,6 +142,8 @@
 		3C30AF9B2CB8D5DE00446BA4 /* CryptoUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoUtils.swift; sourceTree = "<group>"; };
 		3C30AF9E2CBCAB4A00446BA4 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		3C30AFB12CC0D14400446BA4 /* ExtensionTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionTabBar.swift; sourceTree = "<group>"; };
+		3C7DEEE32CC624D4005E6A10 /* AboutXTimeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AboutXTimeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3C7DEEE52CC624D4005E6A10 /* AboutXTimeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutXTimeUITests.swift; sourceTree = "<group>"; };
 		3C8BDADC2C96DFAB00567697 /* PendingCapsulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingCapsulesView.swift; sourceTree = "<group>"; };
 		3C8BDADE2C96DFBE00567697 /* CapsuleBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleBubbleView.swift; sourceTree = "<group>"; };
 		3C8BDAE02C96E02F00567697 /* ShowCapsulePageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowCapsulePageViewController.swift; sourceTree = "<group>"; };
@@ -188,14 +201,21 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		3C7DEEE02CC624D4005E6A10 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3CF4CFE02C92B9CA00E81916 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C7DF0942CCFC783005E6A10 /* NVActivityIndicatorViewExtended in Frameworks */,
+				3C7DF0932CCFC783005E6A10 /* NVActivityIndicatorView in Frameworks */,
 				3C07D0842C9A879A00F403E2 /* GoogleGenerativeAI in Frameworks */,
-				3C30AFA92CBD46FA00446BA4 /* NVActivityIndicatorViewExtended in Frameworks */,
 				3C07D0792C99D52500F403E2 /* FirebaseAnalytics in Frameworks */,
-				3C30AFA72CBD46FA00446BA4 /* NVActivityIndicatorView in Frameworks */,
 				3C07D07F2C99D52500F403E2 /* FirebaseStorage in Frameworks */,
 				3C30AFA22CBCE66E00446BA4 /* FirebaseCrashlytics in Frameworks */,
 				3C07D07B2C99D52500F403E2 /* FirebaseAuth in Frameworks */,
@@ -353,6 +373,14 @@
 			path = OnboardingPage;
 			sourceTree = "<group>";
 		};
+		3C7DEEE42CC624D4005E6A10 /* AboutXTimeUITests */ = {
+			isa = PBXGroup;
+			children = (
+				3C7DEEE52CC624D4005E6A10 /* AboutXTimeUITests.swift */,
+			);
+			path = AboutXTimeUITests;
+			sourceTree = "<group>";
+		};
 		3C8BDADB2C96DF9500567697 /* View */ = {
 			isa = PBXGroup;
 			children = (
@@ -416,6 +444,7 @@
 			isa = PBXGroup;
 			children = (
 				3CF4CFE52C92B9CA00E81916 /* AboutXTime */,
+				3C7DEEE42CC624D4005E6A10 /* AboutXTimeUITests */,
 				3CF4CFE42C92B9CA00E81916 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -424,6 +453,7 @@
 			isa = PBXGroup;
 			children = (
 				3CF4CFE32C92B9CA00E81916 /* AboutXTime.app */,
+				3C7DEEE32CC624D4005E6A10 /* AboutXTimeUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -588,6 +618,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3C7DEEE22CC624D4005E6A10 /* AboutXTimeUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3C7DEEE92CC624D4005E6A10 /* Build configuration list for PBXNativeTarget "AboutXTimeUITests" */;
+			buildPhases = (
+				3C7DEEDF2CC624D4005E6A10 /* Sources */,
+				3C7DEEE02CC624D4005E6A10 /* Frameworks */,
+				3C7DEEE12CC624D4005E6A10 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3C7DEEE82CC624D4005E6A10 /* PBXTargetDependency */,
+			);
+			name = AboutXTimeUITests;
+			productName = AboutXTimeUITests;
+			productReference = 3C7DEEE32CC624D4005E6A10 /* AboutXTimeUITests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		3CF4CFE22C92B9CA00E81916 /* AboutXTime */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3CF4CFF72C92B9CB00E81916 /* Build configuration list for PBXNativeTarget "AboutXTime" */;
@@ -610,8 +658,8 @@
 				3C07D07E2C99D52500F403E2 /* FirebaseStorage */,
 				3C07D0832C9A879A00F403E2 /* GoogleGenerativeAI */,
 				3C30AFA12CBCE66E00446BA4 /* FirebaseCrashlytics */,
-				3C30AFA62CBD46FA00446BA4 /* NVActivityIndicatorView */,
-				3C30AFA82CBD46FA00446BA4 /* NVActivityIndicatorViewExtended */,
+				3C7DEEF32CCF8DCE005E6A10 /* NVActivityIndicatorView */,
+				3C7DEEF52CCF8DCE005E6A10 /* NVActivityIndicatorViewExtended */,
 			);
 			productName = AboutXTime;
 			productReference = 3CF4CFE32C92B9CA00E81916 /* AboutXTime.app */;
@@ -627,6 +675,10 @@
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
+					3C7DEEE22CC624D4005E6A10 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = 3CF4CFE22C92B9CA00E81916;
+					};
 					3CF4CFE22C92B9CA00E81916 = {
 						CreatedOnToolsVersion = 15.4;
 					};
@@ -644,18 +696,26 @@
 			packageReferences = (
 				3C07D0772C99D52500F403E2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				3C07D0822C9A879A00F403E2 /* XCRemoteSwiftPackageReference "generative-ai-swift" */,
-				3C30AFA52CBD46FA00446BA4 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */,
+				3C7DEEF22CCF8DCE005E6A10 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */,
 			);
 			productRefGroup = 3CF4CFE42C92B9CA00E81916 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				3CF4CFE22C92B9CA00E81916 /* AboutXTime */,
+				3C7DEEE22CC624D4005E6A10 /* AboutXTimeUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		3C7DEEE12CC624D4005E6A10 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3CF4CFE12C92B9CA00E81916 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -709,11 +769,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which swiftlint > /dev/null; then\n  swiftlint lint --config \"${SRCROOT}/swiftlint.yml\"\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3C7DEEDF2CC624D4005E6A10 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3C7DEEE62CC624D4005E6A10 /* AboutXTimeUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3CF4CFDF2C92B9CA00E81916 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -799,6 +867,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		3C7DEEE82CC624D4005E6A10 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3CF4CFE22C92B9CA00E81916 /* AboutXTime */;
+			targetProxy = 3C7DEEE72CC624D4005E6A10 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		3CF4CFEC2C92B9CA00E81916 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -819,6 +895,45 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		3C7DEEEA2CC624D4005E6A10 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = R77283CQJW;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nicky.AboutXTimeUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AboutXTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AboutXTime";
+			};
+			name = Debug;
+		};
+		3C7DEEEB2CC624D4005E6A10 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R77283CQJW;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nicky.AboutXTimeUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AboutXTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AboutXTime";
+			};
+			name = Release;
+		};
 		3CF4CFF52C92B9CB00E81916 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -964,7 +1079,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.siminyang.AboutXTime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1003,7 +1118,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.siminyang.AboutXTime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1019,6 +1134,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3C7DEEE92CC624D4005E6A10 /* Build configuration list for PBXNativeTarget "AboutXTimeUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3C7DEEEA2CC624D4005E6A10 /* Debug */,
+				3C7DEEEB2CC624D4005E6A10 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		3CF4CFDE2C92B9CA00E81916 /* Build configuration list for PBXProject "AboutXTime" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1056,7 +1180,7 @@
 				minimumVersion = 0.5.6;
 			};
 		};
-		3C30AFA52CBD46FA00446BA4 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */ = {
+		3C7DEEF22CCF8DCE005E6A10 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ninjaprox/NVActivityIndicatorView.git";
 			requirement = {
@@ -1097,14 +1221,14 @@
 			package = 3C07D0772C99D52500F403E2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
 		};
-		3C30AFA62CBD46FA00446BA4 /* NVActivityIndicatorView */ = {
+		3C7DEEF32CCF8DCE005E6A10 /* NVActivityIndicatorView */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3C30AFA52CBD46FA00446BA4 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
+			package = 3C7DEEF22CCF8DCE005E6A10 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
 			productName = NVActivityIndicatorView;
 		};
-		3C30AFA82CBD46FA00446BA4 /* NVActivityIndicatorViewExtended */ = {
+		3C7DEEF52CCF8DCE005E6A10 /* NVActivityIndicatorViewExtended */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3C30AFA52CBD46FA00446BA4 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
+			package = 3C7DEEF22CCF8DCE005E6A10 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
 			productName = NVActivityIndicatorViewExtended;
 		};
 /* End XCSwiftPackageProductDependency section */

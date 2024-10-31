@@ -51,7 +51,7 @@ struct ProfileView: View {
                     Button(action: {
                         UIPasteboard.general.string = viewModel.userID
                         showCopyNotification()
-                    }) {
+                    }, label: {
                         HStack {
                             Text("ID: \(viewModel.userID)")
                                 .font(.caption)
@@ -61,7 +61,7 @@ struct ProfileView: View {
                                 .foregroundColor(.gray)
                                 .font(.subheadline)
                         }
-                    }
+                    })
                     .buttonStyle(PlainButtonStyle())
 
                     ShareLink(item: viewModel.userID) {
@@ -110,7 +110,8 @@ struct ProfileView: View {
                                                     .frame(width: 100)
                                                     .background(Color.white.opacity(0.2))
                                                     .onSubmit {
-                                                        viewModel.updateFriendName(friendID: friend.id, newName: newFriendName)
+                                                        viewModel.updateFriendName(friendID: friend.id,
+                                                                                   newName: newFriendName)
                                                         editingFriendID = nil
                                                     }
                                             } else {
@@ -122,17 +123,17 @@ struct ProfileView: View {
                                             Button(action: {
                                                 editingFriendID = friend.id
                                                 newFriendName = friend.fullName
-                                            }) {
+                                            }, label: {
                                                 Image(systemName: "pencil")
                                                     .foregroundColor(.gray)
-                                            }
+                                            })
                                         }
                                         .padding(.bottom, 30)
 
                                         Button(action: {
                                             UIPasteboard.general.string = friend.id
                                             showCopyNotification()
-                                        }) {
+                                        }, label: {
                                             HStack {
                                                 Text("ID: \(friend.id)")
                                                     .font(.system(size: 10))
@@ -143,7 +144,7 @@ struct ProfileView: View {
                                                     .foregroundColor(.gray)
                                             }
                                             .frame(maxWidth: .infinity, alignment: .leading)
-                                        }
+                                        })
                                     }
                                     .padding()
                                     .frame(width: 150, height: 250)
@@ -161,10 +162,10 @@ struct ProfileView: View {
                                             print("Report Button Pressed: \(selectedFriendId ?? "No ID")")
                                             print("Alert Type: \(alertType)")
                                             print("Show Alert: \(showAlert)")
-                                        }) {
+                                        }, label: {
                                             Label("檢舉", systemImage: "exclamationmark.triangle")
                                                 .foregroundColor(.red)
-                                        }
+                                        })
 
                                         Button(action: {
                                             selectedFriendId = friend.id
@@ -172,10 +173,10 @@ struct ProfileView: View {
                                             DispatchQueue.main.async {
                                                 showAlert = true
                                             }
-                                        }) {
+                                        }, label: {
                                             Label("封鎖", systemImage: "hand.raised.fill")
                                                 .foregroundColor(.red)
-                                        }
+                                        })
 
                                         Button(action: {
                                             selectedFriendId = friend.id
@@ -183,10 +184,10 @@ struct ProfileView: View {
                                             DispatchQueue.main.async {
                                                 showAlert = true
                                             }
-                                        }) {
+                                        }, label: {
                                             Label("刪除好友", systemImage: "trash")
                                                 .foregroundColor(.red)
-                                        }
+                                        })
                                     } label: {
                                         Image(systemName: "exclamationmark.square.fill")
                                             .foregroundColor(.gray)

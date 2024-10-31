@@ -33,6 +33,5 @@ class FriendsCacheManager {
 
         friendsCache.setObject(friendWrapper, forKey: friendId)
         print("Caching friend: \(friendId)")
-        print("Cached friend details: ID=\(friend.id), Name=\(friend.fullName), Avatar=\(friend.avatar), Date=\(friend.latestInteractionDate)")
     }
 }

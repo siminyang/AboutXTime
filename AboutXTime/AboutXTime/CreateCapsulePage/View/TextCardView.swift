@@ -39,8 +39,8 @@ struct TextCardView: View {
                     removeKeyboardObservers()
                     isCustomSentTextFieldFocused = false
                 }
-                .onChange(of: isNotFocused) { notFocused in
-                    if notFocused {
+                .onChange(of: isNotFocused) {
+                    if isNotFocused {
                         triggerFetchContent()
                     }
                 }
@@ -109,8 +109,8 @@ struct TextCardView: View {
         .onDisappear {
             removeKeyboardObservers()
         }
-        .onChange(of: isCustomSentTextFieldFocused) { focused in
-            if !focused {
+        .onChange(of: isCustomSentTextFieldFocused) {
+            if !isCustomSentTextFieldFocused {
                 removeKeyboardObservers()
             }
         }
@@ -125,14 +125,13 @@ struct TextCardView: View {
         }
     }
 
+    @MainActor
     private func triggerFetchContent() {
         Task {
             await viewModel.fetchContent()
-            DispatchQueue.main.async {
-                self.recommendedLabels = viewModel.response
-                    .components(separatedBy: "、")
-                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            }
+            self.recommendedLabels = viewModel.response
+                .components(separatedBy: "、")
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
         }
     }
 

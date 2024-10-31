@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum STColor: String {
-    case C1 = "#B026FF" // 霓虹紫
+    case CC1 = "#B026FF" // 霓虹紫
     case CC2 = "#7df9ff" // 霓虹藍
     case CC3 = "#ffff33" // 霓虹黃
     case CC4 = "#ff00ff" // 霓虹粉

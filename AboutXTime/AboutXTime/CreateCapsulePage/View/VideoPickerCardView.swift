@@ -23,7 +23,7 @@ struct VideoPickerCardView: View {
 
                 Button(action: {
                     clearVideoData()
-                }) {
+                }, label: {
                     HStack {
                         Image(systemName: "trash")
                         Text("刪除影片")
@@ -31,7 +31,7 @@ struct VideoPickerCardView: View {
                     .padding()
                     .foregroundColor(.red)
                     .font(.headline)
-                }
+                })
             } else {
                 Image(systemName: "video.fill")
                     .padding()

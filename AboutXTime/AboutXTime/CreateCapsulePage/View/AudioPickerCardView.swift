@@ -18,7 +18,7 @@ struct AudioPickerCardView: View {
             if let audioURL = audioRecorder.audioURL ?? localAudioUrl {
                 Button(action: {
                     audioRecorder.playAudio(url: audioURL)
-                }) {
+                }, label: {
                     if audioRecorder.isAudioPlaying {
                         Image(systemName: "pause.circle")
                             .resizable()
@@ -28,7 +28,7 @@ struct AudioPickerCardView: View {
                             .resizable()
                             .frame(width: 80, height: 80)
                     }
-                }
+                })
                 .padding()
 
                 Text("播放時間: \(formatTime(audioRecorder.playbackTime)) / \(formatTime(audioRecorder.audioDuration))")
@@ -47,7 +47,7 @@ struct AudioPickerCardView: View {
 
                 Button(action: {
                     deleteAudio()
-                }) {
+                }, label: {
                     HStack {
                         Image(systemName: "trash")
                         Text("刪除語音訊息")
@@ -55,7 +55,7 @@ struct AudioPickerCardView: View {
                     .padding()
                     .foregroundColor(.red)
                     .font(.headline)
-                }
+                })
             } else {
                 // 顯示錄音進度
                 ActivityIndicatorView(type: .lineScaleParty,

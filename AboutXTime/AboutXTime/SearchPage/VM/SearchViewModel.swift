@@ -10,11 +10,6 @@ import SwiftUI
 
 class SearchViewModel: ObservableObject {
     @Published var searchText: String = ""
-//    {
-//        didSet {
-//            searchText = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-//        }
-//    }
     @Published var filteredCapsules: [Int: [Capsule]] = [:]
     @Published var isSearching = false
     private var allCapsules: [Capsule]
@@ -48,7 +43,7 @@ class SearchViewModel: ObservableObject {
                 if self.searchText.isEmpty {
                     self.filteredCapsules = self.groupCapsulesByAge(capsules: self.allCapsules)
                 } else {
-                    var imageTag: Int? = nil
+                    var imageTag: Int?
                     if let mappedTag = labelMappingAllCases[self.searchText.lowercased()] {
                         imageTag = mappedTag
                     }
