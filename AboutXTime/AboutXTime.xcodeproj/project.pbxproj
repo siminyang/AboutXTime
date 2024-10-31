@@ -44,8 +44,11 @@
 		3C30AFA22CBCE66E00446BA4 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 3C30AFA12CBCE66E00446BA4 /* FirebaseCrashlytics */; };
 		3C30AFB22CC0D14500446BA4 /* ExtensionTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C30AFB12CC0D14400446BA4 /* ExtensionTabBar.swift */; };
 		3C7DEEE62CC624D4005E6A10 /* AboutXTimeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7DEEE52CC624D4005E6A10 /* AboutXTimeUITests.swift */; };
-		3C7DF0932CCFC783005E6A10 /* NVActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 3C7DEEF32CCF8DCE005E6A10 /* NVActivityIndicatorView */; };
-		3C7DF0942CCFC783005E6A10 /* NVActivityIndicatorViewExtended in Frameworks */ = {isa = PBXBuildFile; productRef = 3C7DEEF52CCF8DCE005E6A10 /* NVActivityIndicatorViewExtended */; };
+
+		3C7DF0992CE35330005E6A10 /* PendingCapsulesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7DF0982CE35330005E6A10 /* PendingCapsulesViewModel.swift */; };
+		3C7DF09C2CE5BFA4005E6A10 /* NVActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 3C7DF09B2CE5BFA4005E6A10 /* NVActivityIndicatorView */; };
+		3C7DF09E2CE5BFA4005E6A10 /* NVActivityIndicatorViewExtended in Frameworks */ = {isa = PBXBuildFile; productRef = 3C7DF09D2CE5BFA4005E6A10 /* NVActivityIndicatorViewExtended */; };
+
 		3C8BDADD2C96DFAB00567697 /* PendingCapsulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C8BDADC2C96DFAB00567697 /* PendingCapsulesView.swift */; };
 		3C8BDADF2C96DFBE00567697 /* CapsuleBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C8BDADE2C96DFBE00567697 /* CapsuleBubbleView.swift */; };
 		3C8BDAE12C96E02F00567697 /* ShowCapsulePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C8BDAE02C96E02F00567697 /* ShowCapsulePageViewController.swift */; };
@@ -144,6 +147,10 @@
 		3C30AFB12CC0D14400446BA4 /* ExtensionTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionTabBar.swift; sourceTree = "<group>"; };
 		3C7DEEE32CC624D4005E6A10 /* AboutXTimeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AboutXTimeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C7DEEE52CC624D4005E6A10 /* AboutXTimeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutXTimeUITests.swift; sourceTree = "<group>"; };
+
+		3C7DF0982CE35330005E6A10 /* PendingCapsulesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingCapsulesViewModel.swift; sourceTree = "<group>"; };
+
+
 		3C8BDADC2C96DFAB00567697 /* PendingCapsulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingCapsulesView.swift; sourceTree = "<group>"; };
 		3C8BDADE2C96DFBE00567697 /* CapsuleBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleBubbleView.swift; sourceTree = "<group>"; };
 		3C8BDAE02C96E02F00567697 /* ShowCapsulePageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowCapsulePageViewController.swift; sourceTree = "<group>"; };
@@ -215,7 +222,11 @@
 				3C7DF0942CCFC783005E6A10 /* NVActivityIndicatorViewExtended in Frameworks */,
 				3C7DF0932CCFC783005E6A10 /* NVActivityIndicatorView in Frameworks */,
 				3C07D0842C9A879A00F403E2 /* GoogleGenerativeAI in Frameworks */,
+
+				3C7DF09E2CE5BFA4005E6A10 /* NVActivityIndicatorViewExtended in Frameworks */,
 				3C07D0792C99D52500F403E2 /* FirebaseAnalytics in Frameworks */,
+				3C7DF09C2CE5BFA4005E6A10 /* NVActivityIndicatorView in Frameworks */,
+
 				3C07D07F2C99D52500F403E2 /* FirebaseStorage in Frameworks */,
 				3C30AFA22CBCE66E00446BA4 /* FirebaseCrashlytics in Frameworks */,
 				3C07D07B2C99D52500F403E2 /* FirebaseAuth in Frameworks */,
@@ -381,6 +392,16 @@
 			path = AboutXTimeUITests;
 			sourceTree = "<group>";
 		};
+
+		3C7DF0972CE3531C005E6A10 /* VM */ = {
+			isa = PBXGroup;
+			children = (
+				3C7DF0982CE35330005E6A10 /* PendingCapsulesViewModel.swift */,
+			);
+			path = VM;
+			sourceTree = "<group>";
+		};
+
 		3C8BDADB2C96DF9500567697 /* View */ = {
 			isa = PBXGroup;
 			children = (
@@ -564,6 +585,7 @@
 		3CFEDF4E2C93F3CA00BBD2BC /* PendingCapsulePage */ = {
 			isa = PBXGroup;
 			children = (
+				3C7DF0972CE3531C005E6A10 /* VM */,
 				3C8BDADB2C96DF9500567697 /* View */,
 				3CFEDF4F2C93F3DA00BBD2BC /* VC */,
 			);
@@ -658,8 +680,10 @@
 				3C07D07E2C99D52500F403E2 /* FirebaseStorage */,
 				3C07D0832C9A879A00F403E2 /* GoogleGenerativeAI */,
 				3C30AFA12CBCE66E00446BA4 /* FirebaseCrashlytics */,
-				3C7DEEF32CCF8DCE005E6A10 /* NVActivityIndicatorView */,
-				3C7DEEF52CCF8DCE005E6A10 /* NVActivityIndicatorViewExtended */,
+
+				3C7DF09B2CE5BFA4005E6A10 /* NVActivityIndicatorView */,
+				3C7DF09D2CE5BFA4005E6A10 /* NVActivityIndicatorViewExtended */,
+
 			);
 			productName = AboutXTime;
 			productReference = 3CF4CFE32C92B9CA00E81916 /* AboutXTime.app */;
@@ -696,7 +720,9 @@
 			packageReferences = (
 				3C07D0772C99D52500F403E2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				3C07D0822C9A879A00F403E2 /* XCRemoteSwiftPackageReference "generative-ai-swift" */,
-				3C7DEEF22CCF8DCE005E6A10 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */,
+
+				3C7DF09A2CE5BFA4005E6A10 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */,
+
 			);
 			productRefGroup = 3CF4CFE42C92B9CA00E81916 /* Products */;
 			projectDirPath = "";
@@ -807,6 +833,7 @@
 				3C30AF9C2CB8D5DE00446BA4 /* CryptoUtils.swift in Sources */,
 				3C8BDAE52C97CF5500567697 /* ShowCapsulePageView.swift in Sources */,
 				3CFEDF392C934A4900BBD2BC /* CapsuleCardTabView.swift in Sources */,
+				3C7DF0992CE35330005E6A10 /* PendingCapsulesViewModel.swift in Sources */,
 				3C30AFB22CC0D14500446BA4 /* ExtensionTabBar.swift in Sources */,
 				3CFEDF512C93F3FC00BBD2BC /* PendingCapsulesViewController.swift in Sources */,
 				3C2795F22C94479700DEA03A /* VideoRecorderViewController.swift in Sources */,
@@ -1180,7 +1207,9 @@
 				minimumVersion = 0.5.6;
 			};
 		};
-		3C7DEEF22CCF8DCE005E6A10 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */ = {
+
+		3C7DF09A2CE5BFA4005E6A10 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */ = {
+
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ninjaprox/NVActivityIndicatorView.git";
 			requirement = {
@@ -1221,14 +1250,16 @@
 			package = 3C07D0772C99D52500F403E2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
 		};
-		3C7DEEF32CCF8DCE005E6A10 /* NVActivityIndicatorView */ = {
+
+		3C7DF09B2CE5BFA4005E6A10 /* NVActivityIndicatorView */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3C7DEEF22CCF8DCE005E6A10 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
+			package = 3C7DF09A2CE5BFA4005E6A10 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
 			productName = NVActivityIndicatorView;
 		};
-		3C7DEEF52CCF8DCE005E6A10 /* NVActivityIndicatorViewExtended */ = {
+		3C7DF09D2CE5BFA4005E6A10 /* NVActivityIndicatorViewExtended */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3C7DEEF22CCF8DCE005E6A10 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
+			package = 3C7DF09A2CE5BFA4005E6A10 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
+
 			productName = NVActivityIndicatorViewExtended;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -14,15 +14,18 @@ class ProfileViewModel: ObservableObject {
     @Published var userAvatar: String = "planet4"
     @Published var userID: String = ""
     @Published var friends: [Friend] = []
-    @Published var showReportConfirmation: Bool = false
-    @Published var showBlockConfirmation: Bool = false
-    @Published var showDeleteConfirmation: Bool = false
-    @Published var showErrorAlert: Bool = false
+    @Published var alertType: AlertType?
+    @Published var isShowingCopyAlert = false
 
     private let database = Firestore.firestore()
     private var userIDFromFirestore: String
     private let avatarKey = "userAvatar"
     private var listener: ListenerRegistration?
+
+    enum AlertType: Identifiable {
+        case report, block, delete, reportConfirmation, blockConfirmation, deleteConfirmation, error
+        var id: Self { self }
+    }
 
     init(userID: String) {
         self.userIDFromFirestore = userID
@@ -97,8 +100,10 @@ class ProfileViewModel: ObservableObject {
                 switch result {
                 case .success(let document):
                     let data = document.data()
-                    self.userFullName = data?["name"] as? String ?? "User"
-                    self.userID = self.userIDFromFirestore
+                    DispatchQueue.main.async {
+                        self.userFullName = data?["name"] as? String ?? "User"
+                        self.userID = self.userIDFromFirestore
+                    }
 
                     if let friendsArray = data?["friends"] as? [[String: Any]] {
                         self.friends = friendsArray.compactMap { Friend(dictionary: $0) }
@@ -109,6 +114,18 @@ class ProfileViewModel: ObservableObject {
                     print("Error fetching user data: \(error.localizedDescription)")
                 }
             }
+    }
+
+    func showCopyNotification() {
+        withAnimation {
+            isShowingCopyAlert = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            guard let self = self else { return }
+            withAnimation {
+                self.isShowingCopyAlert = false
+            }
+        }
     }
 
     // 查找朋友的名字
@@ -136,8 +153,10 @@ class ProfileViewModel: ObservableObject {
             }
         }
     }
+}
 
-    // MARK: 更改頭像或名稱方法
+// MARK: - 更改頭像或名稱方法
+extension ProfileViewModel {
     private func updateUserAvatarInFirestore(avatar: String) {
         FirebaseManager.shared.saveData(collection: Constant.users,
                                         documentID: userIDFromFirestore,
@@ -186,15 +205,14 @@ extension ProfileViewModel {
     func reportFriend(friendId: String) {
         print("Reporting friend with ID: \(friendId)")
 
-        FirebaseManager.shared.deleteFriendId(userId: userID, friendId: friendId) { result in
-            switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    self.showReportConfirmation = true
-                }
-            case .failure:
-                DispatchQueue.main.async {
-                    self.showErrorAlert = true
+        FirebaseManager.shared.deleteFriendId(userId: userID, friendId: friendId) { [weak self] result in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self.alertType = .reportConfirmation
+                case .failure:
+                    self.alertType = .error
                 }
             }
         }
@@ -203,15 +221,14 @@ extension ProfileViewModel {
     func blockFriend(friendId: String) {
         print("blocking friend with ID: \(friendId)")
 
-        FirebaseManager.shared.deleteFriendId(userId: userID, friendId: friendId) { result in
-            switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    self.showBlockConfirmation = true
-                }
-            case .failure:
-                DispatchQueue.main.async {
-                    self.showErrorAlert = true
+        FirebaseManager.shared.deleteFriendId(userId: userID, friendId: friendId) { [weak self] result in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self.alertType = .blockConfirmation
+                case .failure:
+                    self.alertType = .error
                 }
             }
         }
@@ -220,15 +237,16 @@ extension ProfileViewModel {
     func deleteFriend(friendId: String) {
         print("deleting friend with ID: \(friendId)")
 
-        FirebaseManager.shared.deleteFriendId(userId: userID, friendId: friendId) { result in
-            switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    self.showDeleteConfirmation = true
-                }
-            case .failure:
-                DispatchQueue.main.async {
-                    self.showErrorAlert = true
+        FirebaseManager.shared.deleteFriendId(userId: userID, friendId: friendId) { [weak self] result in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    print("Friend successfully deleted.")
+                    self.alertType = .deleteConfirmation
+                case .failure:
+                    print("Failed to delete friend with error")
+                    self.alertType = .error
                 }
             }
         }

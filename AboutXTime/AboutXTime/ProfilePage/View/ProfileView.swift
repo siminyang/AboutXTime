@@ -8,22 +8,13 @@
 import Foundation
 import SwiftUI
 
+// MARK: - ProfileView
 struct ProfileView: View {
     @StateObject private var viewModel: ProfileViewModel
     @AppStorage("userAvatar") private var userAvatar: String = "planet4"
 
-    @State private var isEditingFriendName: Bool = false
-    @State private var editingFriendID: String?
     @State private var newFriendName: String = ""
-    @State private var isShowingCopyAlert = false
-
-    @State private var showAlert = false
     @State private var selectedFriendId: String?
-    @State private var alertType: AlertType = .none
-
-    enum AlertType {
-        case report, block, delete, none
-    }
 
     init(userID: String) {
         _viewModel = StateObject(wrappedValue: ProfileViewModel(userID: userID))
@@ -50,7 +41,7 @@ struct ProfileView: View {
                 HStack {
                     Button(action: {
                         UIPasteboard.general.string = viewModel.userID
-                        showCopyNotification()
+                        viewModel.showCopyNotification()
                     }, label: {
                         HStack {
                             Text("ID: \(viewModel.userID)")
@@ -90,173 +81,117 @@ struct ProfileView: View {
                         LazyHStack(spacing: 20) {
                             ForEach(viewModel.friends) { friend in
                                 ZStack(alignment: .topTrailing) {
-                                    VStack {
-                                        Image(friend.avatar)
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .frame(width: 60, height: 60)
-                                            .clipShape(Circle())
-                                            .shadow(radius: 5)
-                                            .onTapGesture {
-                                                viewModel.changeFriendAvatar(friendID: friend.id)
-                                            }
-                                            .padding()
-
-                                        HStack {
-                                            if editingFriendID == friend.id {
-                                                TextField("Name", text: $newFriendName)
-                                                    .font(.body)
-                                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                                    .frame(width: 100)
-                                                    .background(Color.white.opacity(0.2))
-                                                    .onSubmit {
-                                                        viewModel.updateFriendName(friendID: friend.id,
-                                                                                   newName: newFriendName)
-                                                        editingFriendID = nil
-                                                    }
-                                            } else {
-                                                Text(friend.fullName)
-                                                    .font(.caption)
-                                                    .foregroundColor(.white)
-                                            }
-
-                                            Button(action: {
-                                                editingFriendID = friend.id
-                                                newFriendName = friend.fullName
-                                            }, label: {
-                                                Image(systemName: "pencil")
-                                                    .foregroundColor(.gray)
-                                            })
-                                        }
-                                        .padding(.bottom, 30)
-
-                                        Button(action: {
+                                    FriendRowList(
+                                        viewModel: viewModel,
+                                        friend: friend,
+                                        onEditName: { newFriendName in
+                                            viewModel.updateFriendName(friendID: friend.id, newName: newFriendName)},
+                                        onCopyID: {
                                             UIPasteboard.general.string = friend.id
-                                            showCopyNotification()
-                                        }, label: {
-                                            HStack {
-                                                Text("ID: \(friend.id)")
-                                                    .font(.system(size: 10))
-                                                    .foregroundColor(.gray)
-                                                    .multilineTextAlignment(.leading)
-
-                                                Image(systemName: "doc.on.doc")
-                                                    .foregroundColor(.gray)
-                                            }
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                        })
-                                    }
-                                    .padding()
-                                    .frame(width: 150, height: 250)
-                                    .background(Color.gray.opacity(0.1))
-                                    .cornerRadius(8)
-
-                                    Menu {
-                                        Button(action: {
-                                            print("======= 檢舉按鈕被按下")
+                                            viewModel.showCopyNotification()
+                                        }, 
+                                        onChangeAvater: {
+                                            viewModel.changeFriendAvatar(friendID: friend.id)
+                                        },
+                                        onReport: {
                                             selectedFriendId = friend.id
-                                            alertType = .report
-                                            DispatchQueue.main.async {
-                                                showAlert = true
-                                            }
-                                            print("Report Button Pressed: \(selectedFriendId ?? "No ID")")
-                                            print("Alert Type: \(alertType)")
-                                            print("Show Alert: \(showAlert)")
-                                        }, label: {
-                                            Label("檢舉", systemImage: "exclamationmark.triangle")
-                                                .foregroundColor(.red)
-                                        })
-
-                                        Button(action: {
+                                            viewModel.alertType = .report
+                                        },
+                                        onBlock: {
                                             selectedFriendId = friend.id
-                                            alertType = .block
-                                            DispatchQueue.main.async {
-                                                showAlert = true
-                                            }
-                                        }, label: {
-                                            Label("封鎖", systemImage: "hand.raised.fill")
-                                                .foregroundColor(.red)
-                                        })
-
-                                        Button(action: {
+                                            viewModel.alertType = .block
+                                        },
+                                        onDelete: {
                                             selectedFriendId = friend.id
-                                            alertType = .delete
-                                            DispatchQueue.main.async {
-                                                showAlert = true
-                                            }
-                                        }, label: {
-                                            Label("刪除好友", systemImage: "trash")
-                                                .foregroundColor(.red)
-                                        })
-                                    } label: {
-                                        Image(systemName: "exclamationmark.square.fill")
-                                            .foregroundColor(.gray)
-                                            .padding(8)
-                                    }
+                                            viewModel.alertType = .delete
+                                        }
+                                    )
                                 }
                             }
                         }
                         .padding(.horizontal, 16)
                     }
                     .frame(height: 250)
-                    Spacer()
                 }
-
                 Spacer()
             }
             .padding()
-            .alert(isPresented: Binding<Bool>(
-                get: {
-                    alertType != .none ||
-                    viewModel.showReportConfirmation ||
-                    viewModel.showBlockConfirmation ||
-                    viewModel.showDeleteConfirmation ||
-                    viewModel.showErrorAlert
-                },
-                set: { newValue in
-                    if !newValue {
-                        resetAlertStates()
-                    }
-                }
-            )) {
-                if alertType != .none {
-                    return getAlert()
-                } else if viewModel.showReportConfirmation {
+            .alert(item: $viewModel.alertType) { alertType in
+                switch alertType {
+                case .report:
+                    return Alert(
+                        title: Text("確定要檢舉嗎？"),
+                        message: Text("這將向系統報告該用戶。"),
+                        primaryButton: .destructive(Text("確定")) {
+                            print("按下確定")
+                            if let friendId = selectedFriendId {
+                                print("id ======= \(friendId)")
+                                viewModel.reportFriend(friendId: friendId)
+                            }
+                            viewModel.alertType = .reportConfirmation
+                        },
+                        secondaryButton: .cancel()
+                    )
+                case .block:
+                    return Alert(
+                        title: Text("確定要封鎖嗎？"),
+                        message: Text("該用戶將無法與您互動。"),
+                        primaryButton: .destructive(Text("確定")) {
+                            if let friendId = selectedFriendId {
+                                viewModel.blockFriend(friendId: friendId)
+                            }
+                            viewModel.alertType = .blockConfirmation
+                        },
+                        secondaryButton: .cancel()
+                    )
+                case .delete:
+                    return Alert(
+                        title: Text("確定要刪除好友嗎？"),
+                        message: Text("刪除後將無法恢復。"),
+                        primaryButton: .destructive(Text("確定")) {
+                            if let friendId = selectedFriendId {
+                                viewModel.deleteFriend(friendId: friendId)
+                            }
+                            viewModel.alertType = .deleteConfirmation
+                        },
+                        secondaryButton: .cancel()
+                    )
+                case .reportConfirmation:
                     return Alert(
                         title: Text("已向系統回報"),
                         message: Text("您的檢舉已經提交。"),
                         dismissButton: .default(Text("確定")) {
-                            resetAlertStates()
+                            viewModel.alertType = nil
                         }
                     )
-                } else if viewModel.showBlockConfirmation {
+                case .blockConfirmation:
                     return Alert(
                         title: Text("封鎖成功"),
                         message: Text("該用戶已被封鎖。"),
                         dismissButton: .default(Text("確定")) {
-                            resetAlertStates()
+                            viewModel.alertType = nil
                         }
                     )
-                } else if viewModel.showDeleteConfirmation {
+                case .deleteConfirmation:
                     return Alert(
                         title: Text("好友已刪除"),
                         message: Text("該用戶已從您的好友列表中刪除。"),
                         dismissButton: .default(Text("確定")) {
-                            resetAlertStates()
+                            viewModel.alertType = nil
                         }
                     )
-                } else if viewModel.showErrorAlert {
+                case .error:
                     return Alert(
                         title: Text("操作失敗"),
-                        message: Text("系統繁忙，請稍後再試。"),
-                        dismissButton: .default(Text("確定"))
+                        message: Text("網路連線異常，請稍後再試。"),
+                        dismissButton: .default(Text("確定")) {
+                            viewModel.alertType = nil
+                        }
                     )
-                } else {
-                    return Alert(title: Text(""))
                 }
             }
 
-            if isShowingCopyAlert {
+            if viewModel.isShowingCopyAlert {
                 VStack {
                     Spacer()
                     Text("已複製到剪貼板!")
@@ -272,76 +207,109 @@ struct ProfileView: View {
             }
         }
     }
+}
 
-    // MARK: - Methods
-    private func showCopyNotification() {
-        withAnimation {
-            isShowingCopyAlert = true
-        }
+// MARK: - FriendRowList
+struct FriendRowList: View {
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            withAnimation {
-                isShowingCopyAlert = false
+    @ObservedObject var viewModel: ProfileViewModel
+    let friend: Friend
+    let onEditName: (String) -> Void
+    let onCopyID: () -> Void
+    let onChangeAvater: () -> Void
+    let onReport: () -> Void
+    let onBlock: () -> Void
+    let onDelete: () -> Void
+
+    @State private var isEditingName = false
+    @State private var newFriendName = ""
+
+    var body: some View {
+        VStack {
+            Image(friend.avatar)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 60, height: 60)
+                .clipShape(Circle())
+                .shadow(radius: 5)
+                .onTapGesture {
+                    onChangeAvater()
+                }
+                .padding()
+
+            HStack {
+                if isEditingName {
+                    TextField("Name", text: $newFriendName)
+                        .font(.body)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .frame(width: 100)
+                        .background(Color.white.opacity(0.2))
+                        .onSubmit {
+                            onEditName(newFriendName)
+                            isEditingName = false
+                        }
+                } else {
+                    Text(friend.fullName)
+                        .font(.caption)
+                        .foregroundColor(.white)
+                }
+
+                Button(action: {
+                    isEditingName = true
+                    newFriendName = friend.fullName
+                }, label: {
+                    Image(systemName: "pencil")
+                        .foregroundColor(.gray)
+                })
+            }
+            .padding(.bottom, 30)
+
+            Button(action: onCopyID) {
+                HStack {
+                    Text("ID: \(friend.id)")
+                        .font(.system(size: 10))
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.leading)
+
+                    Image(systemName: "doc.on.doc")
+                        .foregroundColor(.gray)
+                }
+                .padding(.horizontal)
             }
         }
-    }
+        .frame(width: 150, height: 250)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(8)
 
-    private func getAlert() -> Alert {
-        switch alertType {
-        case .report:
-            return Alert(
-                title: Text("確定要檢舉嗎？"),
-                message: Text("這將向系統報告該用戶。"),
-                primaryButton: .destructive(Text("確定")) {
-                    print("按下確定")
-                    if let friendId = selectedFriendId {
-                        print("id ======= \(friendId)")
-                        viewModel.reportFriend(friendId: friendId)
-                    }
-                    DispatchQueue.main.async {
-                        viewModel.showReportConfirmation = true
-                    }
-                },
-                secondaryButton: .cancel()
-            )
-        case .block:
-            return Alert(
-                title: Text("確定要封鎖嗎？"),
-                message: Text("該用戶將無法與您互動。"),
-                primaryButton: .destructive(Text("確定")) {
-                    if let friendId = selectedFriendId {
-                        viewModel.blockFriend(friendId: friendId)
-                    }
-                    DispatchQueue.main.async {
-                        viewModel.showBlockConfirmation = true
-                    }
-                },
-                secondaryButton: .cancel()
-            )
-        case .delete:
-            return Alert(
-                title: Text("確定要刪除好友嗎？"),
-                message: Text("刪除後將無法恢復。"),
-                primaryButton: .destructive(Text("確定")) {
-                    if let friendId = selectedFriendId {
-                        viewModel.deleteFriend(friendId: friendId)
-                    }
-                    DispatchQueue.main.async {
-                        viewModel.showDeleteConfirmation = true
-                    }
-                },
-                secondaryButton: .cancel()
-            )
-        case .none:
-            return Alert(title: Text(""))
+        Menu {
+            Button(action: {
+                onReport()
+                print("======= 檢舉按鈕被按下")
+                print("Alert Type: \(String(describing: viewModel.alertType))")
+            }, label: {
+                Label("檢舉", systemImage: "exclamationmark.triangle")
+                    .foregroundColor(.red)
+            })
+
+            Button(action: {
+                onBlock()
+                print("Alert Type: \(String(describing: viewModel.alertType))")
+            }, label: {
+                Label("封鎖", systemImage: "hand.raised.fill")
+                    .foregroundColor(.red)
+            })
+
+            Button(action: {
+                onDelete()
+                print("Alert Type: \(String(describing: viewModel.alertType))")
+            }, label: {
+                Label("刪除好友", systemImage: "trash")
+                    .foregroundColor(.red)
+            })
+        } label: {
+            Image(systemName: "exclamationmark.square.fill")
+                .foregroundColor(.gray)
+                .padding(8)
         }
-    }
-
-    private func resetAlertStates() {
-        showAlert = false
-        viewModel.showReportConfirmation = false
-        viewModel.showBlockConfirmation = false
-        viewModel.showDeleteConfirmation = false
-        alertType = .none
     }
 }

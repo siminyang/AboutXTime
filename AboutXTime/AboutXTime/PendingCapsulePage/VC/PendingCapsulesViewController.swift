@@ -7,10 +7,12 @@
 
 import UIKit
 import SwiftUI
+import Combine
 
 class PendingCapsulesViewController: UIViewController {
-    private var capsules: [Capsule] = []
     private var hostingController: UIHostingController<PendingCapsulesView>?
+    private var viewModel = PendingCapsulesViewModel()
+    private var cancellables = Set<AnyCancellable>()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,7 +23,8 @@ class PendingCapsulesViewController: UIViewController {
         setGlobalNavigaionBarAppearance()
         clearVisualEffectView()
 
-        fetchCapsules()
+        setUpBinding()
+        viewModel.fetchCapsules()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -29,34 +32,25 @@ class PendingCapsulesViewController: UIViewController {
         tabBarController?.tabBar.isHidden = false
     }
 
-    private func fetchCapsules() {
+    private func setUpBinding() {
+        viewModel.$capsules
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] capsules in
+                self?.setupContentView(with: capsules)
+            }
+            .store(in: &cancellables)
 
-        guard let userId = UserDefaults.standard.string(forKey: "userUID") else {
-            print("Failed to get UID from UserDefaults.")
-            return
-        }
-
-        FirebaseManager.shared.fetchUserCapsules(userId: userId) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let capsules):
-                    self?.capsules = capsules
-                    self?.delayContentUpdate()
-                    print(">>>>>>> Fetched capsules: \(capsules)")
-                case .failure(let error):
-                    print("Error fetching capsules: \(error.localizedDescription)")
+        viewModel.$errorMessage
+            .receive(on: DispatchQueue.main)
+            .sink { errorMessage in
+                if let errorMessage = errorMessage {
+                    print("Error fetching capsules \(errorMessage)")
                 }
             }
-        }
+            .store(in: &cancellables)
     }
 
-    private func delayContentUpdate() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.setupContentView()
-        }
-    }
-
-    private func setupContentView() {
+    private func setupContentView(with capsules: [Capsule]) {
         let contentView = PendingCapsulesView(capsules: capsules)
         let hostingController = UIHostingController(rootView: contentView)
 
