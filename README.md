@@ -58,10 +58,11 @@ Whether for personal memories or shared experiences with friends, the Time Capsu
 - iOS 17 or higher
   
 ## Version
-> 1.0.1
+> 1.1.0
 
 ## Release Notes
 | Version | Date | Notes |
 | -------- | -------- | -------- |
-| 1.0.0   | 2024.10.14     | Released in App Store.   |
+| 1.0.0   | 2024.10.14     | Released on App Store.   |
 | 1.0.1   | 2024.10.15    | Fix bug.     |
+| 1.1.0   | 2024.11.18   | Added notification feature.     |
