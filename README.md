@@ -5,7 +5,7 @@ About X Time
 ============
 <p align="left">
     <img src="https://img.shields.io/badge/platform-iOS-lightgray">
-    <img src="https://img.shields.io/badge/release-v1.0.1-green">
+    <img src="https://img.shields.io/badge/release-v1.1.0-green">
     <img src="https://img.shields.io/badge/Swift-FA7343.svg?logo=swift&logoColor=white">
 </p>
 
@@ -45,6 +45,8 @@ Whether for personal memories or shared experiences with friends, the Time Capsu
 
 ![7](https://github.com/user-attachments/assets/3ae4481d-8ef5-4c8a-9510-69495bb12e07)      ![8](https://github.com/user-attachments/assets/7ec0c925-0e7e-4746-a4e6-6035c857af48)
 
+### Cloud Notification
+* Sends timely reminders to let you know if there are capsules ready to be unlocked.
 
 ## Libraries
 - [NVActivityIndicatorView](https://github.com/ninjaprox/NVActivityIndicatorView)
